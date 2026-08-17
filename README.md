@@ -1,1 +1,167 @@
-Precon Deck
+# Azure: From Admin to Architect — 2026 Edition
+
+A full-day preconference session that reframes Azure infrastructure knowledge
+through the **Azure Well-Architected Framework**, Zero Trust, and infrastructure
+as code — plus deployable Terraform and run-of-show scripts for every live demo
+in the deck.
+
+The premise: an admin keeps services running, an architect makes deliberate
+trade-offs across competing priorities. Every topic in the deck is presented as a
+decision with a cost, not a feature with a checkbox.
+
+**Audience:** experienced Azure and Windows/SQL administrators moving into
+architecture or platform roles.
+**Format:** 61 slides across 9 sections, with 5 scripted live demos.
+
+---
+
+## Repository layout
+
+| Path | What it is |
+|---|---|
+| [slides.md](slides.md) | The deck — every slide, in delivery order, as speaker-ready bullets |
+| [demos/](demos/) | Terraform + run-of-show scripts for the five **Demonstration** slides |
+| [demos/README.md](demos/README.md) | Demo index: slide map, prerequisites, blast radius, precon-day schedule, cost |
+
+---
+
+## The deck
+
+[slides.md](slides.md) is the source of truth. It is written as bullets you speak
+from, not sentences you read aloud.
+
+| Section | Slides | What it covers |
+|---|---|---|
+| **Opening & Framing** | 6 | The mindset shift, the five WAF pillars as the language of trade-offs, why lift-and-shift carries on-prem assumptions forward, shared responsibility, and IaC as the architect's default |
+| **1 — Reliability & High Availability** | 4 | Start from RTO/RPO, not from redundancy. Availability Zones as the modern default, scale sets, and a multi-region reality check |
+| **2 — Azure SQL & Data Platform** | 8 | Deployment models, Hyperscale, serverless vs. provisioned, Managed Instance security posture, HA tiers, PostgreSQL/MySQL, Cosmos DB, and where Synapse now sits relative to Fabric |
+| **3 — Governance** | 11 | Management group hierarchy, CAF landing zones, tagging, RBAC, PIM and just-in-time access, access reviews, and Azure Policy as compliance-as-code |
+| **4 — Networking & Network Security** | 11 | Zero Trust framing (identity is the perimeter), private endpoints over service endpoints over public, hub-and-spoke, load balancing layers, WAF, Firewall, NSGs/ASGs, and Bastion |
+| **5 — Virtual Machines & Storage** | 7 | The architect's VM checklist, sizing, the compute + storage cost model, disk tiers for SQL, encryption with customer-managed keys, and moving storage access past keys and SAS |
+| **6 — Identity & Secrets** | 6 | Entra ID as the control plane, Conditional Access, B2B/External ID, managed identities, and Key Vault |
+| **7 — Automation & Serverless** | 6 | Runbooks, Azure Functions hosting models, and Logic Apps |
+| **Closing** | 2 | The architect's WAF checklist, and three things to do on Monday |
+
+### Through-lines
+
+Four ideas recur deliberately, so the room hears them more than once in different
+contexts:
+
+- **Identity is the perimeter.** Conditional Access, PIM, managed identities and
+  Entra-ID-first data access appear in governance, networking, storage and
+  automation — not just in the identity section.
+- **Trade-offs are the job.** Every recommendation is paired with what it costs:
+  multi-region vs. the outage it prevents, always-ready instances vs. cold start,
+  reservations vs. flexibility.
+- **IaC makes it reviewable.** Click-ops isn't wrong because it's slow; it's wrong
+  because there's no diff, no author, and no revert.
+- **Test the thing you're relying on.** Untested DR is a hope. An unassigned
+  policy is a document. A certificate you renew by hand is an outage with a date on it.
+
+### What's new in the 2026 edition
+
+If you have delivered an earlier version of this session, these are the
+substantive changes:
+
+- **Promoted** identity and Zero Trust to a through-line rather than one section
+- **Added** Infrastructure as Code, CAF enterprise-scale landing zones, Savings
+  Plans, Azure Front Door, and a multi-region reliability reminder
+- **Rewrote** the storage security story away from account keys and ad-hoc SAS
+  toward Entra ID auth, user-delegation SAS and private endpoints
+- **Retired** the classic subscription administrator roles and the
+  Availability-Sets-first framing; replaced static admin slides with PIM
+- **Reframed** Synapse around Microsoft Fabric as the roadmap for new analytics work
+- **Consolidated** four HA slides and several repetitive admin-role slides
+
+---
+
+## The demos
+
+Five live demos, one per **Demonstration** slide. Each is a self-contained
+Terraform stack with its own state, resource group and teardown — deploy one, all
+five, or whatever your timing allows.
+
+| # | Demo | Deck slide | What it proves |
+|---|---|---|---|
+| 01 | [Policy & Compliance](demos/01-policy-compliance/) | Section 3 | A Deny-capable policy running in report-only mode, showing exactly what it *would* have blocked before it blocks anything |
+| 02 | [VNet Peering](demos/02-vnet-peering/) | Section 4 | Hub-and-spoke connectivity works, spoke-to-spoke doesn't — peering is non-transitive, and you watch the ping fail |
+| 03 | [Key Vault Cert Rotation](demos/03-keyvault-cert-rotation/) | Section 6 | A certificate that renews itself, issues a fresh key pair, and raises an event nobody has to watch for |
+| 04 | [Function App](demos/04-function-app/) | Section 7 | Open the app settings blade and try to find the storage connection string. There isn't one |
+| 05 | [Logic App Workflow](demos/05-logic-app/) | Section 7 | Low-code is not un-architected: the workflow is deployed from Terraform and the business rule is a reviewable diff |
+
+Every demo README follows the same structure — the one takeaway, what the
+Terraform builds and *why* each choice is what it is, pre-flight steps with
+timings, numbered beats with talk track and exact commands, a symptom → cause →
+fix table for when it breaks live, teardown, and approximate cost.
+
+The stacks also reach back to non-demo slides for free: Bastion and VPN gateways
+are flags on demo 02, managed identities appear in three different services
+across demos 03–05, and every stack is an excuse to put a `.tf` file next to a
+portal blade.
+
+### Quick start
+
+```bash
+az login
+az account set --subscription "<your-subscription-id>"
+
+cd demos
+./scripts/deploy-all.sh              # all five
+./scripts/deploy-all.sh 01 05        # or just the ones you need
+```
+
+Read [demos/README.md](demos/README.md) before a live session — it has the
+day-before / T-60 / T-15 schedule, and the two demos that need advance notice
+(a VPN gateway takes 30–45 minutes to provision; the function app's first code
+publish does a slow remote build).
+
+### Prerequisites
+
+| Tool | Version | Needed for |
+|---|---|---|
+| [Terraform](https://developer.hashicorp.com/terraform/install) | ≥ 1.6 | All demos |
+| [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) | ≥ 2.60 | All demos |
+| [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) | v4 | Demo 04 only |
+
+An Azure subscription you can create resource groups in. Demos 03–05 create role
+assignments scoped to resources they create, so those need `Owner` or
+`User Access Administrator`; demos 01 and 02 do not.
+
+### Safety and cost
+
+The demo stacks are built to be safe to run in a subscription you share with
+other people:
+
+- **Nothing enforces or mutates by default.** Demo 01 assigns its initiative in
+  `DoNotEnforce` mode with audit-only effects and no managed identity. Deny and
+  Modify are separate opt-in switches.
+- **Nothing is scoped above its own resource group.** No subscription-level or
+  management-group-level assignments, ever.
+- **Every role assignment is on a resource the same stack created**, and
+  disappears with `terraform destroy`.
+- **Under $2 for all five stacks for a day** on defaults. The only two components
+  that cost real money — a VPN gateway and Azure Bastion — are off by default.
+
+See [Blast radius](demos/README.md#blast-radius) for a per-stack breakdown, and
+run `./scripts/destroy-all.sh` when you're done.
+
+---
+
+## Using this material
+
+The deck is plain markdown, so it renders anywhere and converts cleanly:
+
+```bash
+# Reveal.js / PowerPoint via pandoc
+pandoc slides.md -t revealjs -s --slide-level=3 -o slides.html
+pandoc slides.md --slide-level=3 -o slides.pptx
+```
+
+Slide breaks are `### Slide:` headings and section breaks are `## ` headings —
+hence `--slide-level=3`. Most markdown presentation tools will split it correctly
+given the same hint.
+
+If you fork this for your own delivery, the parts most worth adapting are the
+`prefix` and `location` variables in each demo's `terraform.tfvars.example`, and
+the talk track in each demo README — the commands will work as-is, but the
+framing should sound like you.
