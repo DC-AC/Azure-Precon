@@ -1,0 +1,29 @@
+{
+  "if": {
+    "allOf": [
+      {
+        "field": "[concat('tags[', parameters('tagName'), ']')]",
+        "exists": "false"
+      },
+      {
+        "value": "[resourceGroup().tags[parameters('tagName')]]",
+        "notEquals": ""
+      }
+    ]
+  },
+  "then": {
+    "effect": "modify",
+    "details": {
+      "roleDefinitionIds": [
+        "/providers/Microsoft.Authorization/roleDefinitions/${tag_contributor_role_definition_id}"
+      ],
+      "operations": [
+        {
+          "operation": "add",
+          "field": "[concat('tags[', parameters('tagName'), ']')]",
+          "value": "[resourceGroup().tags[parameters('tagName')]]"
+        }
+      ]
+    }
+  }
+}

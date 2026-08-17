@@ -1,0 +1,31 @@
+# Copy to terraform.tfvars and edit as needed.
+
+# subscription_id    = "00000000-0000-0000-0000-000000000000"
+prefix   = "azpre"
+location = "eastus2"
+
+required_tag_name  = "CostCenter"
+required_tag_value = "FIN-1042"
+
+###############################################################################
+# Blast-radius controls — the defaults below are report-only.
+#
+# As shipped this stack cannot block a deployment or modify a resource. Leave it
+# that way unless you have a specific reason not to, and turn it back afterwards.
+###############################################################################
+
+# Assign the initiative to THIS stack's resource group only.
+# false = create the definitions and initiative but attach them to nothing.
+create_policy_assignment = true
+
+# false = DoNotEnforce. Compliance is evaluated and reported; Deny and Modify
+# effects do not fire. This is Azure Policy's own report-only switch.
+enforce_policies = false
+
+# false = no Modify policy, no managed identity, no role assignment, nothing
+# that can write to a resource. Also drops the permission requirement from
+# Owner / User Access Administrator to Resource Policy Contributor.
+enable_remediation = false
+
+# Leave at Audit. Deny only has teeth when enforce_policies is also true.
+audit_effect = "Audit"

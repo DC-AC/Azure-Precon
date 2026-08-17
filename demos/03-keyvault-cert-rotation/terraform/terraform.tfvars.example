@@ -1,0 +1,19 @@
+# Copy to terraform.tfvars and edit as needed.
+
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+prefix   = "azpre"
+location = "eastus2"
+
+certificate_name      = "app-tls-cert"
+certificate_subject   = "CN=demo.precon.local"
+certificate_dns_names = ["demo.precon.local", "www.demo.precon.local"]
+
+# Short life so the auto-renew date is a near-term, believable number on screen.
+certificate_validity_months    = 3
+auto_renew_lifetime_percentage = 80
+
+# Production-correct is `true`. Left false so `terraform destroy` can finish.
+enable_purge_protection = false
+
+# Storage queue + Event Grid subscription so rotation events are visible live.
+enable_event_grid = true

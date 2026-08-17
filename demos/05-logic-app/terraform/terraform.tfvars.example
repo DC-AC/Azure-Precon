@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and edit as needed.
+
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+prefix   = "azpre"
+location = "eastus2"
+
+# The business rule. Change it and re-apply on stage to show a policy change
+# arriving as a reviewable diff rather than a click in a designer.
+approval_threshold = 5000
+
+# Storage account + queue + role assignment, so an Azure Queues connector added
+# live in the designer can authenticate with the managed identity.
+enable_queue_target = true

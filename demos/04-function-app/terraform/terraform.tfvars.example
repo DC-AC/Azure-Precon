@@ -1,0 +1,23 @@
+# Copy to terraform.tfvars and edit as needed.
+
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+prefix = "azpre"
+
+# Flex Consumption is region-limited. Verify with:
+#   az functionapp list-flexconsumption-locations -o table
+location = "eastus2"
+
+runtime_name    = "python"
+runtime_version = "3.11"
+
+# Performance Efficiency knobs — set them deliberately, don't inherit defaults.
+instance_memory_in_mb  = 2048
+maximum_instance_count = 40
+
+# 0 = scale to zero and accept cold starts. 1 = no cold start, billed 24x7.
+# Flipping this on stage makes the cost/latency trade-off concrete.
+always_ready_instance_count = 0
+
+# Entra-ID-only storage. Verify your deploy path works in pre-flight before
+# turning this on for a live session.
+disable_storage_shared_key = false
