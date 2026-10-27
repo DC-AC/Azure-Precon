@@ -1,6 +1,6 @@
 # Demo 03 — Certificate Auto-Rotation in Key Vault
 
-**Deck slide:** *Demonstration — Certificate Auto-Rotation in Key Vault* (Section 6 — Identity & Secrets)
+**Deck slide:** *Demonstration — Certificate Auto-Rotation in Key Vault* (Section 6 — Identity, Secrets & Security Posture)
 
 > - Configure automated certificate rotation to remove manual renewal risk
 

@@ -1,0 +1,26 @@
+# Copy to terraform.tfvars and edit as needed.
+
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+prefix = "azpre"
+
+# Flex Consumption is region-limited. Verify with:
+#   az functionapp list-flexconsumption-locations -o table
+location = "eastus2"
+
+# Your laptop's public IP, for the one firewall rule. Set it at the venue —
+# conference Wi-Fi will not be the network you rehearsed on:
+#   curl -s https://api.ipify.org
+client_ip_address = ""
+
+# Leave TRUE for pre-flight. Flipping it to false on stage is the demo.
+public_network_access_enabled = true
+
+# Empty = whoever runs terraform apply becomes the server's Entra admin.
+# Production: an Entra group's object ID.
+entra_admin_object_id = ""
+
+# 60 minutes idle and the database pauses itself (compute billing stops).
+auto_pause_delay_in_minutes = 60
+
+# Local = cheapest backups, no geo-restore. Geo/GeoZone if you want to show it.
+backup_storage_redundancy = "Local"

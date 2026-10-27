@@ -57,8 +57,8 @@ nice aside for the Bastion slide.
 | 4 peering resources (hub↔spoke1, hub↔spoke2) | **Two per link** — peering is reciprocal |
 | 2 more peerings, gated by `enable_spoke_to_spoke_peering` | The live fix |
 | NSG using **service tags** (`VirtualNetwork`, `Internet`) | Not hand-maintained CIDR lists |
-| 3 × `Standard_B1s` Ubuntu VMs, no public IPs | Connectivity proof |
-| VPN gateway + zone-redundant public IP | **Optional** — `deploy_vpn_gateway` |
+| 3 × `Standard_B2ats_v2` Ubuntu VMs, no public IPs | Connectivity proof |
+| VPN gateway (`VpnGw1AZ`) + zone-redundant public IP | **Optional** — `deploy_vpn_gateway`. Must be an AZ SKU: non-AZ SKUs can no longer be created |
 | Azure Bastion + public IP | **Optional** — `deploy_bastion` |
 
 ### Optional pieces, and why they're optional
@@ -83,6 +83,9 @@ cp terraform.tfvars.example terraform.tfvars
 
 az login
 az account set --subscription "<your-subscription-id>"
+
+# Empty "Restrictions" column = the VM size is available to you in this region
+az vm list-skus -l eastus2 --size Standard_B2ats_v2 -o table
 
 terraform init
 terraform apply          # ~4 minutes without the gateway
@@ -229,6 +232,8 @@ terraform output -raw vm_admin_password
 | `use_remote_gateways` apply error | Gateway not fully provisioned | `depends_on` handles it; if it races, re-run `terraform apply` |
 | Peering shows `Disconnected` | One side deleted/recreated | Re-apply — both directions must exist |
 | Spoke-to-spoke still fails after the fix | Peering state still `Updating` | Give it ~30 seconds and re-run the ping |
+| Gateway apply: SKU not allowed / not supported | A non-AZ SKU (`VpnGw1`) — creation blocked since Nov 2025 | Use `VpnGw1AZ` (the default); the variable validation should catch this first |
+| VM apply: `SkuNotAvailable` | Size capacity-restricted in the region | `az vm list-skus -l <region> --size <size> -o table`, pick an unrestricted size, set `vm_size` |
 
 ---
 
@@ -248,10 +253,10 @@ not while you're packing up.
 
 | Component | ~USD/hour |
 |---|---|
-| 3 × B1s VMs + Standard HDD OS disks | ~$0.04 |
+| 3 × B2ats_v2 VMs + Standard HDD OS disks | ~$0.04 |
 | VNets, subnets, NSGs, peering (idle) | $0.00 |
 | Peering data transfer | ~$0.01/GB each direction — negligible for pings |
-| VPN gateway (VpnGw1), optional | ~$0.19 |
+| VPN gateway (VpnGw1AZ), optional | ~$0.19 |
 | Azure Bastion (Basic), optional | ~$0.19 |
 
 Base stack: well under **$1/day**. With both optional components: ~**$10/day**.

@@ -8,9 +8,9 @@ hub_address_space    = "10.0.0.0/16"
 spoke1_address_space = "10.1.0.0/16"
 spoke2_address_space = "10.2.0.0/16"
 
-# Two B1s VMs per spoke plus one in the hub. Needed to prove connectivity.
+# One small VM per spoke plus one in the hub. Needed to prove connectivity.
 deploy_test_vms = true
-vm_size         = "Standard_B1s"
+vm_size         = "Standard_B2ats_v2"
 
 # Leave FALSE for the live demo — the failed spoke-to-spoke ping is the point.
 enable_spoke_to_spoke_peering = false

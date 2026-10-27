@@ -2,7 +2,7 @@
 #
 # Tear down the demo stacks.
 #
-#   ./destroy-all.sh                # all five, with a confirmation prompt
+#   ./destroy-all.sh                # all seven, with a confirmation prompt
 #   ./destroy-all.sh 02             # just that one
 #   FORCE=1 ./destroy-all.sh        # skip the prompt (use in CI / cleanup jobs)
 #
@@ -18,6 +18,8 @@ ALL_DEMOS=(
   "03-keyvault-cert-rotation"
   "04-function-app"
   "05-logic-app"
+  "06-azure-sql-private"
+  "07-observability-alerts"
 )
 
 select_demos() {
@@ -78,3 +80,5 @@ done
 
 echo "Done."
 echo "Note: a VPN gateway (demo 02) can take 10-20 minutes to finish deleting."
+echo "Note: if you ran demo 06's point-in-time restore, the restored database is not"
+echo "      in Terraform state - it is deleted with the server."

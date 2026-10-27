@@ -2,7 +2,7 @@
 #
 # Deploy the demo stacks for "Azure: From Admin to Architect".
 #
-#   ./deploy-all.sh                 # all five demos
+#   ./deploy-all.sh                 # all seven demos
 #   ./deploy-all.sh 01 04           # just those two
 #
 # Each stack is independent. Terraform state stays in its own directory.
@@ -16,6 +16,8 @@ ALL_DEMOS=(
   "03-keyvault-cert-rotation"
   "04-function-app"
   "05-logic-app"
+  "06-azure-sql-private"
+  "07-observability-alerts"
 )
 
 select_demos() {
@@ -85,4 +87,10 @@ Reminders:
   * Demo 04 still needs the code deployed:
       cd 04-function-app/src && func azure functionapp publish <app-name>
   * Demo 02's VPN gateway is off by default (30-45 min to provision).
+  * Demo 06 needs your laptop's IP in client_ip_address, and its code deployed:
+      cd 06-azure-sql-private/src && func azure functionapp publish <app-name>
+    Deploy it the day before - point-in-time restore needs some history.
+  * Demo 07 needs alert_email and/or alert_sms_number in its terraform.tfvars,
+    and deploys an ENFORCED DeployIfNotExists policy scoped to its own resource
+    group. Give remediation 15-30 minutes before you present.
 EOF

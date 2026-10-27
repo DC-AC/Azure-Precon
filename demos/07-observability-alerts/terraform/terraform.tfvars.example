@@ -1,0 +1,21 @@
+# Copy to terraform.tfvars and edit as needed.
+
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+prefix   = "azpre"
+location = "eastus2"
+
+# Where the alerts go. Set at least one, or the demo's payoff has no audience.
+alert_email      = ""
+alert_sms_number = "" # digits only, no country code
+# alert_sms_country_code = "1"
+
+# Denied requests in the window before either alert fires.
+forbidden_request_threshold = 5
+
+# true = DeployIfNotExists policy wires the diagnostic setting (the point).
+# false = Terraform does it directly (stage fallback if remediation is slow).
+diagnostics_via_policy = true
+
+# Some subscription offers don't support budgets — set false there.
+create_budget         = true
+monthly_budget_amount = 10

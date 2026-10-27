@@ -105,7 +105,7 @@ Portal → the function app → **Overview**, then the App Service plan → **FC
 
 | Plan | Bills for | Cold start | Use when |
 |---|---|---|---|
-| **Consumption** | Executions + GB-seconds | Yes | Spiky, tolerant of latency |
+| **Consumption** | Executions + GB-seconds | Yes | Windows only, for new work — **Linux Consumption retires Sept 30, 2028** and gets no new language versions |
 | **Flex Consumption** | Executions + GB-seconds, with optional always-ready | Optional | The current default — scale to zero *and* VNet integration |
 | **Premium** | Pre-warmed instances, 24×7 | No | Sustained load, VNet, long runs |
 | **Dedicated** | The App Service plan you already own | No | Spare capacity on an existing plan |
