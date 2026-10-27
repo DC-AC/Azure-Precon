@@ -1,5 +1,3 @@
-
-
 # Azure: From Admin to Architect — 2026 Edition
 *Reframed through the Azure Well-Architected Framework & Modern Security/Design*
 
@@ -7,160 +5,194 @@
 
 ## Opening & Framing
 
-### Slide: From Admin to Architect — The Mindset Shift
+### From Admin to Architect — The Mindset Shift
 - An admin keeps services running; an architect makes deliberate trade-offs across competing priorities
 - The five WAF pillars — Reliability, Security, Cost Optimization, Operational Excellence, Performance Efficiency — are the language of those trade-offs
 - Every decision today gets weighed against the pillars, not against "what we did on-prem"
 
-### Slide: The Problem with Lift-and-Shift (Reworked)
+### The Problem with Lift-and-Shift
 - Moving VMs as-is carries forward on-prem assumptions: snowflake servers, manual patching, over-permissioned access
 - You pay cloud prices for on-prem architecture — worst of both on cost and operations
 - Modernization is a spectrum: rehost → replatform → refactor; pick per workload against business value, not dogma
 
-### Slide: What Architecture Is Actually For
+### What Architecture Is Actually For
 - Translating business requirements (RTO/RPO, compliance, budget, scale) into technical design
 - Making trade-offs explicit and reviewable, not implicit and accidental
 - Use the Azure Well-Architected Review and Azure Advisor to score and prioritize — architecture as a continuous practice
 
-### Slide: Shared Responsibility — Know Where Your Job Starts (Reworked)
+### Shared Responsibility — Know Where Your Job Starts
 - IaaS, PaaS, SaaS shift different amounts of burden to Microsoft
 - **You always own** data, identity & access, and configuration — regardless of model
 - "Trust but verify" the provider; most cloud breaches trace to customer-side misconfiguration, not platform failure
 
-### Slide: The Cloud Value Proposition Through WAF (Reworked)
+### The Cloud Value Proposition Through WAF
 - **IaaS:** elastic compute/storage, higher baseline availability, software-defined networking enabling automation
 - **PaaS:** built-in HA, platform backups, automated patching, evergreen versions — DR often costs extra
 - WAF lens: PaaS advances Operational Excellence and Reliability, but you still validate DR and govern cost
 
-### Slide: Infrastructure as Code — The Architect's Default (New)
+### Infrastructure as Code — The Architect's Default
 - Click-ops doesn't scale and isn't reviewable — define infrastructure in **Bicep / Terraform**, version it in Git
 - Deploy through pipelines with policy checks; treat environments as reproducible, not hand-built
+- Start from **Azure Verified Modules (AVM)** — Microsoft-maintained Terraform and Bicep modules — rather than hand-writing every resource
 - IaC underpins Operational Excellence and makes security/compliance enforceable by default
 
 ---
 
-## Section 1 — Reliability & High Availability
+## Section 1 — Reliability, High Availability & Recovery
 
-### Slide: Designing for Reliability — Start with the Targets
+### Designing for Reliability — Start with the Targets
 - Define RTO and RPO per workload *first* — redundancy is a means, not a goal
 - Map targets to Azure constructs: availability zones, regions, paired regions
 - Reliability pillar: redundancy, failure-mode analysis, and **tested** recovery — untested DR is a hope, not a plan
 
-### Slide: Availability Zones over Availability Sets (Reworked)
+### Availability Zones over Availability Sets
 - **Availability Zones** are now the default for VM resilience — physically separate datacenters, higher SLA than sets
 - Availability Sets (fault/update domains) still exist but are the legacy single-datacenter option
 - Pair zones with zone-redundant load balancing and storage for true datacenter-failure survival
 
-### Slide: Virtual Machine Scale Sets
+### Virtual Machine Scale Sets
 - Identically configured, load-balanced VMs with manual, scheduled, and autoscale options
 - Auto-distributes across fault and update domains; flexible orchestration mode is now standard
 - Performance Efficiency: scale to real demand with clear thresholds, not fixed over-provisioning
 
-### Slide: A 2026 Reliability Reminder (New)
+### A 2026 Reliability Reminder
 - Regional incidents still happen — single-region designs carry single-region risk
 - For mission-critical workloads, plan multi-region geodiversity, not just multi-zone
 - Decide consciously: the cost of multi-region vs. the cost of the outage it prevents
+
+### Backup Is the Last Line — Make It Ransomware-Proof
+- **Azure Backup** covers VMs, SQL Server in VMs, Azure Files, blobs, managed disks, and AKS — one vault model, one policy model
+- Turn on **immutable vaults**, soft delete, and **multi-user authorization** so a compromised admin can't delete the backups too
+- Keep backups outside the blast radius: a separate RBAC boundary, and cross-region restore for regional failure
+
+### Azure Site Recovery — DR for What You Can't Re-Platform
+- Continuous replication of VMs to a secondary region or zone, with orchestrated **recovery plans**
+- **Test failover** into an isolated network without touching production — there's no excuse for an untested plan
+- RPO is replication lag; RTO is how long your recovery plan actually takes to run — know both numbers
+
+### Test the Failure, Not Just the Failover
+- **Azure Chaos Studio** injects faults (zone down, VM shutdown, NSG block, CPU pressure) into real resources as a controlled experiment
+- Schedule DR drills like patching — on a cadence, with an owner, and with the RTO measured, not estimated
+- The output of a drill is a number and a list of fixes; if neither changed, it wasn't really a test
 
 ---
 
 ## Section 2 — Azure SQL & Data Platform
 
-### Slide: Azure SQL — Deployment Models
+### Azure SQL — Deployment Models
 - Single database, elastic pool, managed instance — different isolation and consolidation profiles
 - Elastic pools optimize cost across many databases with uneven, intermittent usage
 - Managed Instance gives near-100% on-prem compatibility for lift-and-shift modernization
 
-### Slide: Hyperscale — Scaling Without Re-architecting
-- Auto-scales storage to 100TB with rapid, independent compute/storage scaling
+### Hyperscale — Scaling Without Re-architecting
+- Auto-scales storage to **128 TB** (100 TB per database in a Hyperscale elastic pool) with rapid, independent compute/storage scaling
 - Fast backups/restores and near-instant scale operations regardless of data size
 - Read-scale-out replicas double as hot standbys — serves both Performance Efficiency and Reliability
 
-### Slide: Serverless vs. Provisioned Compute
-- **Serverless:** auto-pause/resume, per-second billing — best for intermittent single-DB workloads
+### Serverless vs. Provisioned Compute
+- **Serverless:** auto-pause/resume, per-second billing — best for intermittent single-DB workloads (available in General Purpose and Hyperscale)
 - **Provisioned:** uniform utilization, reserved capacity, hourly billing, Azure Hybrid Benefit eligibility
 - Decision driver is workload shape and cost optimization, not feature count
 
-### Slide: Azure SQL Managed Instance — Security Posture (Reworked)
+### Azure SQL Managed Instance — Security Posture
 - Native VNet integration with private IPs — no public surface by default
 - Entra-ID-only authentication, Always Encrypted, TDE with customer-managed keys, Defender for SQL
 - Full instance-level compatibility eases migration without sacrificing isolation
 
-### Slide: HA in Azure SQL (Consolidated from 4 slides)
+### HA in Azure SQL
 - Standard model separates compute/storage; premium/business-critical uses a local replica cluster for lowest latency
 - Hyperscale uses page servers + log service for fast recovery at scale
 - **Zone-redundant** config survives datacenter-level failure within a region
 - Reliability: pick tier + zone/geo redundancy to meet stated RTO/RPO; test failover
 
-### Slide: Azure DB for PostgreSQL & MySQL
-- Flexible Server with zone-redundant HA, read replicas, burstable-to-business-critical tiers
+### Business Continuity for Azure SQL — Restore Is the Test
+- **Point-in-time restore** (1–35 days) and **long-term retention** (up to 10 years) are built in — but a backup you've never restored is an assumption
+- **Active geo-replication** gives readable secondaries; **failover groups** add a stable listener and fail over a set of databases together
+- Choose backup storage redundancy (LRS / ZRS / GRS) deliberately — it decides whether geo-restore is even possible
+
+### Azure DB for PostgreSQL & MySQL
+- **Flexible Server** is the only deployment option now — Single Server was retired (MySQL 2024, PostgreSQL 2025)
+- Zone-redundant HA, read replicas, burstable-to-business-critical tiers
 - Entra ID auth, TLS enforcement, private access, Defender threat protection
 - Encryption at rest with customer-managed keys
 
-### Slide: Cosmos DB — Globally Distributed by Design
-- Multi-region writes, tunable consistency, multiple APIs (SQL, Mongo, Cassandra, Gremlin, Table)
+### Cosmos DB — Globally Distributed by Design
+- Multi-region writes, tunable consistency, multiple APIs (NoSQL, MongoDB, Cassandra, Gremlin, Table)
 - RU-based throughput — performance and cost are the same dial; size it deliberately
 - Performance Efficiency: pick the consistency level that meets correctness needs at lowest latency/cost
 
-### Slide: Where Synapse Fits Now (Reworked)
+### Vectors in Azure SQL — AI-Ready Without a New Database
+- Native `VECTOR` type, **DiskANN vector indexes**, and `VECTOR_SEARCH` — generally available as of September 2026
+- Embeddings live next to the relational data they describe: same security, same backups, same HA, no extra datastore to govern
+- The architect's question: does this workload need a dedicated vector store, or just a vector column?
+
+### Where Synapse Fits Now
 - The old "what's not suitable for Synapse" framing still holds — it's not for OLTP, singleton selects, or row-by-row work
-- But new analytics investment now defaults to **Microsoft Fabric**; Synapse remains supported, not the roadmap
+- New analytics investment defaults to **Microsoft Fabric**; Synapse is supported but shrinking (trusted-services firewall exception retired Aug 2026; Synapse Link for Cosmos DB closed to new accounts)
+- **Fabric mirroring** replicates Azure SQL, Managed Instance, and Cosmos DB into OneLake without ETL — the on-ramp for operational data
 - For an admin-to-architect audience: don't start new analytics builds on Synapse
+
+### Demonstration — Azure SQL, Locked Down
+- Entra-only authentication: no SQL password exists anywhere
+- Turn off public access live; the app keeps working through its private endpoint
+- Point-in-time restore, timed — that's your RTO, measured
 
 ---
 
 ## Section 3 — Governance (The Boring-but-Critical Part)
 
-### Slide: Governance Is a Pillar, Not Paperwork (Reworked)
+### Governance Is a Pillar, Not Paperwork
 - Management groups → subscriptions → resource groups give you scope for policy, budgets, and access
 - Governance enables both Cost Optimization (budgets, chargeback) and Security (guardrails)
 - Design the hierarchy intentionally — it's hard to restructure later
 
-### Slide: Cloud Adoption Framework Landing Zones (New)
-- Don't hand-build subscriptions — start from **CAF enterprise-scale landing zones**
+### Azure Landing Zones (Cloud Adoption Framework)
+- Don't hand-build subscriptions — start from the CAF **Azure landing zone** architecture
 - Landing zones bake in identity, networking, policy, and management baselines from day one
+- Terraform users: the `caf-enterprise-scale` module was deprecated and archived (Sept 2026) — new builds use **Azure Verified Modules for Platform Landing Zones** (aka.ms/alz/tf)
 - Architect's job: adopt the pattern, then tailor — not reinvent governance per project
 
-### Slide: Resource Groups & Organization
+### Resource Groups & Organization
 - Logical grouping tied to lifecycle; can't be nested; each resource belongs to exactly one
 - Organize for authorization, lifecycle, and billing — consistent naming and tagging are non-negotiable
 - Tags drive cost reporting, automation, and ownership — enforce them via policy
 
-### Slide: Management Groups
+### Management Groups
 - Scope above subscriptions for policy and budget targeting with inheritance
 - Compliance and cost reporting aligned to org structure (business units, teams)
 - Keep the hierarchy shallow and purposeful
 
-### Slide: Subscriptions, Limits & Quotas
+### Subscriptions, Limits & Quotas
 - Limits (quotas) apply at subscription and sometimes regional level
 - Raise soft limits via support request at no charge; design around hard limits
 - Architect for quota headroom before you hit it in production
 
-### Slide: RBAC — Identity as the Control Plane (Reworked)
+### RBAC — Identity as the Control Plane
 - Fine-grained, identity-based access built on Azure Resource Manager: security principal + role + scope
 - Grant **least privilege**; segregate duties; prefer built-in roles, create custom only when needed
 - Deny assignments take precedence — use sparingly and deliberately
 
-### Slide: Retire Classic Admin Roles (Reworked)
+### Retire Classic Admin Roles
 - Classic subscription administrator roles (Account/Service/Co-Administrator) are legacy — **fully retired in 2024**
 - Use Azure RBAC roles (Owner, Contributor, Reader, User Access Administrator) and Entra ID roles instead
 - If you still see Co-Administrators, that's technical debt to clean up
 
-### Slide: Privileged Identity Management — Just-in-Time Access (New, replaces static admin slides)
+### Privileged Identity Management — Just-in-Time Access
 - Standing admin access is a liability — **PIM** grants elevated roles just-in-time, time-boxed, with approval
 - Require MFA and justification for activation; auto-expire and audit every elevation
 - Core Zero Trust practice: no permanent privilege, verify every escalation
 
-### Slide: Entra ID Access Reviews
+### Entra ID Access Reviews
 - Periodic certification that access is still needed — for groups, app assignments, and privileged roles
 - Reviewers: specified users, group owners, or self-review; surfaced via the access panel / portal
 - Closes the loop on access creep — pairs with PIM and least privilege
 
-### Slide: Azure Policy — Compliance as Code
+### Azure Policy — Compliance as Code
 - Policy differs from RBAC: RBAC controls *who can act*, Policy controls *what's allowed to exist*
 - Define → assign to scope → evaluate compliance; group into initiatives for whole-estate guardrails
 - Import from GitHub or write custom JSON; enforce locations, SKUs, tags, encryption — automatically
 
-### Slide: Demonstration — Policy & Compliance
+### Demonstration — Policy & Compliance
 - Assign a policy / initiative
 - View non-compliant resources and remediate
 
@@ -168,94 +200,105 @@
 
 ## Section 4 — Networking & Network Security
 
-### Slide: Network Design Through a Zero Trust Lens (Reworked framing)
+### Network Design Through a Zero Trust Lens
 - VNets, subnets, and address spaces are the foundation — plan non-overlapping ranges, secure subnets with NSGs
 - But the perimeter is no longer the network — **identity is the perimeter**; network controls *where*, identity controls *who*
 - Layer both: private connectivity + identity-based access = defense in depth
 
-### Slide: Connectivity Options
-- To internet: outbound allowed by default; inbound via public IP or load balancer (minimize public exposure)
+### Connectivity Options
+- To internet: outbound must be explicit on new VNets (next slide); inbound via public IP or load balancer (minimize public exposure)
 - Between Azure resources: VNet, service/private endpoints, VNet peering
 - To on-prem: point-to-site, site-to-site VPN, ExpressRoute
 
-### Slide: Private Endpoints over Service Endpoints over Public (Reworked)
+### Outbound Is Now a Design Decision
+- Default outbound access is retired for new VNets (March 31, 2026) — subnets are created private, with no implicit internet egress
+- Choose explicitly: **NAT Gateway** for simple egress, **Azure Firewall** in the hub for inspected egress, load balancer outbound rules for legacy patterns
+- Existing VNets keep working — but on behavior Microsoft has retired; plan the migration rather than waiting for a redeploy to break it
+
+### Private Endpoints over Service Endpoints over Public
 - **Private Link / private endpoints** are the modern default — the service joins your VNet, traffic stays on the Microsoft backbone, public IP eliminated
 - Service endpoints are the older, coarser option; public access should be disabled wherever possible
+- **Network Security Perimeter** draws a boundary around PaaS-to-PaaS traffic that never touches a VNet (GA for Storage, Key Vault, Monitor and others; SQL and Cosmos DB in preview)
 - This is the single highest-leverage data-plane security move for PaaS
 
-### Slide: VNet Peering & Hub-and-Spoke
+### VNet Peering & Hub-and-Spoke
 - Peering is non-transitive; reciprocal connections required; cross-subscription supported
 - Global peering connects regions; gateway transit enables hub-and-spoke shared connectivity
 - Hub-and-spoke centralizes shared services (firewall, DNS, gateways) — the standard enterprise topology
 
-### Slide: Demonstration — VNet Peering
+### Demonstration — VNet Peering
 - Configure peering, VPN gateway, gateway transit; confirm connectivity
 
-### Slide: Load Balancing — Pick the Right Layer
+### Load Balancing — Pick the Right Layer
 - **Azure Load Balancer** (L4): source/destination IP, port, protocol — zone-redundant for resilience
+- **Standard SKU only** — Basic Load Balancer and Basic public IPs were retired Sept 30, 2025
 - **Application Gateway** (L7): path-based and multi-site routing, redirection, header rewrite
 - Match the tool to the traffic; combine with zones for HA
 
-### Slide: Application Gateway + WAF
+### Application Gateway + WAF
+- **v2 only** — Application Gateway v1 was retired April 28, 2026
 - Components: frontend IP, listeners, routing rules, backend pools, health probes
 - **Web Application Firewall** protects against OWASP Top 10 — enable it on Application Gateway and Front Door
 - Run WAF in prevention mode in production, not just detection
 
-### Slide: Azure Front Door & Traffic Manager (Reworked)
+### Azure Front Door & Traffic Manager
 - **Traffic Manager** (DNS-based): priority, performance, geographic, weighted routing with health checks
 - **Front Door** adds global L7 acceleration, WAF, and TLS offload at the edge — often the better modern choice for web apps
 - Choose by need: DNS-level failover vs. full edge delivery + security
 
-### Slide: Azure Firewall
+### Azure Firewall
 - Built-in HA, availability zones, cloud-scale; FQDN and network filtering rules; threat intelligence
 - Centralize in the hub for hub-and-spoke egress control
 - Pair with Firewall Manager and DNS proxy for policy at scale
 
-### Slide: NSGs & Application Security Groups
+### NSGs & Application Security Groups
 - NSGs filter subnet/NIC traffic; **service tags** simplify rules (Storage, SQL, AzureLoadBalancer, etc.)
 - **ASGs** scope rules to logical groups of resources instead of IP ranges — far more maintainable
 - Layer NSGs (network) under identity and Firewall (centralized) for defense in depth
 
-### Slide: Azure Bastion — Kill the Public RDP/SSH Surface (Reworked)
+### Azure Bastion — Kill the Public RDP/SSH Surface
 - RDP/SSH directly in the portal over TLS — **no public IP on the VM**, no internet-exposed management ports
 - Protection against port scanning and management-plane exposure
+- SKUs from free **Developer** (dev/test) to **Premium** (session recording, private-only deployment)
 - This eliminates one of the most-attacked surfaces in IaaS; treat public 3389/22 as a finding
 
 ---
 
 ## Section 5 — Virtual Machines & Storage
 
-### Slide: VM Deployment Checklist — Architect's Version
+### VM Deployment Checklist — Architect's Version
 - Start with the network and security (subnets, NSGs, no public IP by default)
 - Right-size deliberately (general/compute/memory/storage/GPU/HPC); name and tag per convention
 - Choose managed disks, plan storage tier, select OS — and understand the pricing model before deploying
 
-### Slide: VM Sizing — Match the Workload
+### VM Sizing — Match the Workload
 - Families map to workload shape: general-purpose, compute-, memory-, storage-optimized, GPU, HPC
 - GPU families now matter for AI training/inference, not just rendering
+- Older families keep retiring (e.g., original B-series by Nov 2028) — standardize on current generations and check the retirement list first
 - Performance Efficiency: size to observed demand, then revisit — don't guess high "to be safe"
 
-### Slide: VM Cost Model — Compute + Storage (Reworked)
+### VM Cost Model — Compute + Storage
 - Two costs per VM: compute and storage
 - Compute payment options: pay-as-you-go, **Reserved Instances**, and **Savings Plans** (flexible across instance types)
 - Cost Optimization: combine reservations/savings plans for the steady floor, PAYG for the variable peak; add Hybrid Benefit
 
-### Slide: Managed Disks & SQL Storage Best Practices
-- Disk tiers: Standard HDD, Standard SSD, Premium SSD, Ultra — SQL belongs on Premium or Ultra
-- Separate data and log volumes; enable read caching on data; stripe for IOPS; enable Instant File Initialization
+### Managed Disks & SQL Storage Best Practices
+- Disk tiers: Standard HDD, Standard SSD, Premium SSD, **Premium SSD v2**, Ultra — SQL belongs on Premium SSD v2, Premium, or Ultra
+- **Premium SSD v2** sets capacity, IOPS, and throughput independently — usually the best price/performance for SQL Server data and log
+- Separate data and log volumes; stripe for IOPS; read caching on Premium SSD data disks (v2 and Ultra have no host caching); enable Instant File Initialization
 - Temporary disk is ephemeral — only for TempDB and other recreatable data
 
-### Slide: Encryption & Disk Security (Reworked)
+### Encryption & Disk Security
 - Encryption at rest is on by default; use **customer-managed keys** in Key Vault for sensitive workloads
-- Consider Azure Disk Encryption / encryption-at-host for defense in depth
+- Use **encryption at host** for end-to-end coverage (temp disk and caches included) — Azure Disk Encryption retires Sept 15, 2028, so don't start new builds on it
 - Confidential computing options exist for data-in-use protection on sensitive workloads
 
-### Slide: Azure Storage — Services & Account Types
+### Azure Storage — Services & Account Types
 - One account groups Blob, File, Queue, Table; choose GPv2 as the modern default
 - Redundancy: LRS, ZRS, GRS, GZRS — map to your durability and residency requirements
 - Blob tiers (Hot/Cool/Cold/Archive) + lifecycle management automate cost optimization
 
-### Slide: Securing Storage — Move Past Keys and SAS (Reworked, important)
+### Securing Storage — Move Past Keys and SAS
 - **Default to Entra ID authentication** for data-plane access — not account keys, not ad-hoc SAS
 - Account keys grant full access and are hard to govern — **disable shared-key access** where possible
 - If SAS is required, prefer **user-delegation SAS** (Entra-backed), scope tightly (time, IP, permission), and disable public blob access
@@ -263,84 +306,146 @@
 
 ---
 
-## Section 6 — Identity & Secrets
+## Section 6 — Identity, Secrets & Security Posture
 
-### Slide: Entra ID — The Identity Foundation (Reworked, de-duplicated)
+### Entra ID — The Identity Foundation
 - Cloud identity and access management: SSO, MFA, conditional access, device registration, monitoring
 - "Azure AD" is now **Microsoft Entra ID** — same backbone, current name; update your mental model and docs
 - Identity is the control plane for everything else in this deck
 
-### Slide: Conditional Access — The Zero Trust Gate (New)
+### Conditional Access — The Zero Trust Gate
 - Verify explicitly: evaluate identity, device compliance, location, and risk on every access request
 - Enforce MFA, block legacy auth, require compliant devices — different thresholds for different data
 - This is where "assume breach" becomes concrete policy
 
-### Slide: Users, Groups & External Identities
+### Mandatory MFA for Azure — The Platform Now Insists
+- MFA is enforced for the Azure portal (since Oct 2024) and for Azure CLI, PowerShell, REST, and IaC tools on create/update/delete (since Oct 2025)
+- Automation running as a human account breaks — scripts and pipelines belong on **managed identities** or **workload identity federation**, which aren't subject to it
+- Treat it as the floor, not the policy: Conditional Access still decides *how strong* and *from where*
+
+### Users, Groups & External Identities
 - Cloud, directory-synced, and guest identities; security vs. Microsoft 365 groups; assigned vs. dynamic membership
 - **B2B** lets partners use their own credentials — no external account management for you
-- **B2C / External ID** handles customer-facing identity with standards-based auth (OIDC, OAuth2, SAML)
+- **Entra External ID** handles customer-facing identity with standards-based auth (OIDC, OAuth2, SAML) — Azure AD B2C closed to new customers in May 2025, so new builds start on External ID
 
-### Slide: Managed Identities — Eliminate Credentials in Code (Reworked)
+### Managed Identities — Eliminate Credentials in Code
 - Combine Entra ID auth with RBAC so apps authenticate **without stored secrets**
 - System-assigned (tied to one resource) vs. user-assigned (shared across resources)
 - Default pattern for service-to-service auth — no keys to rotate, nothing to leak
 
-### Slide: Azure Key Vault — Secrets, Keys, Certificates
+### Workload Identity Federation — Pipelines Without Secrets
+- GitHub Actions, Azure DevOps, HCP Terraform, and Kubernetes exchange their own OIDC token for an Entra token — **no client secret to store or rotate**
+- Federate a user-assigned managed identity or app registration to one repo, branch, or environment — the trust is that narrow
+- This is what "IaC through pipelines" looks like after mandatory MFA: no human in the loop, no secret in the vault
+
+### Azure Key Vault — Secrets, Keys, Certificates
 - Centralized, access-controlled storage for secrets, keys, and certificates; HSM-backed options
-- Grant access at narrow scope via RBAC; enable soft-delete and purge protection
+- **Azure RBAC** is the default for new vaults (API version 2026-02-01) — access policies are legacy, and older control-plane API versions retire Feb 27, 2027
+- Grant access at narrow scope; enable soft-delete and purge protection
 - Pair with managed identities so apps retrieve secrets without ever holding credentials
 
-### Slide: Demonstration — Certificate Auto-Rotation in Key Vault
+### Demonstration — Certificate Auto-Rotation in Key Vault
 - Configure automated certificate rotation to remove manual renewal risk
+
+### Defender for Cloud — Posture You Can Measure
+- **Secure score** turns "are we secure?" into a number with a prioritized list of recommendations
+- Free foundational CSPM for everyone; paid Defender plans add workload protection (servers, SQL, storage, Key Vault) and attack-path analysis
+- Wire it into governance: owners and due dates on recommendations, alerts flowing to your SIEM (Microsoft Sentinel)
 
 ---
 
 ## Section 7 — Automation & Serverless
 
-### Slide: Automation Is the Architect's Force Multiplier (Reworked)
+### Automation Is the Architect's Force Multiplier
 - Manual tasks don't scale and aren't auditable — automate, then govern the automation
 - Azure Automation Runbooks for operational tasks; pair with managed identities, not stored credentials
 - Operational Excellence: codify runbooks, observability, and on-call practice
 
-### Slide: Azure Automation Runbooks
-- PowerShell, PowerShell Workflow, and Python runbooks; graphical authoring available
-- Run in an Azure sandbox or on a Hybrid Runbook Worker for on-prem/local resources
-- Source from the gallery or your own repo; trigger via portal, PowerShell, or schedule
+### Azure Automation Runbooks
+- PowerShell and Python runbooks in **runtime environments**; graphical authoring available
+- Python 2.7/3.8 and PowerShell 7.1/7.2 runtimes were retired Sept 30, 2026 — target PowerShell 7.6 (PowerShell Workflow is 5.1-only; don't write new ones)
+- Run in an Azure sandbox or on an extension-based Hybrid Runbook Worker for on-prem/local resources
+- Source from the gallery or your own repo; trigger via portal, webhook, schedule, or an Azure Monitor alert
 
-### Slide: Azure Functions — Event-Driven Compute
-- Trigger on HTTP, timers, queues, blobs, Event Grid, Event Hubs, Service Bus, Cosmos DB changes
-- Hosting: Consumption, Premium, Dedicated, and Flex Consumption; KEDA for self-hosted Kubernetes
+### Azure Functions — Event-Driven Compute
+- Trigger on HTTP, timers, queues, blobs, Event Grid, Event Hubs, Service Bus, Cosmos DB changes, SQL changes
+- Hosting: **Flex Consumption** (the serverless default — VNet integration, always-ready instances), Premium, Dedicated, and Container Apps; KEDA for self-hosted Kubernetes
+- Linux Consumption retires Sept 30, 2028 and gets no new language versions — migrate with `az functionapp flex-migration`
 - Durable Functions add stateful orchestration; pay-per-use aligns cost to actual execution
 
-### Slide: Demonstration — Create a Function App
+### Demonstration — Create a Function App
 - Create and verify a function app
 
-### Slide: Azure Logic Apps — Workflow Orchestration
+### Azure Logic Apps — Workflow Orchestration
 - Schedule, automate, and orchestrate across apps, data, and services with low-code workflows
 - Trigger-driven: an event fires, the engine runs the action sequence
+- **Consumption** (multi-tenant, pay per action) vs. **Standard** (single-tenant, VNet integration, local dev and source control)
 - Hundreds of connectors plus custom connectors; graphical designer for building and maintaining flows
 
-### Slide: Demonstration — Logic App Workflow
+### Demonstration — Logic App Workflow
 - Create a logic app, add a trigger, run it
+
+---
+
+## Section 8 — Operations: Observability & Cost
+
+### You Can't Operate What You Can't See
+- Operational Excellence and Reliability both depend on telemetry you decided to collect *before* the incident
+- **Azure Monitor** is one platform: metrics (fast, numeric, 93 days), logs (rich, queried with KQL), traces (Application Insights / OpenTelemetry)
+- Platform metrics are free and on by default; resource logs are **off** until you send them somewhere
+
+### Log Analytics Workspace Design
+- Fewer workspaces is better — one per region or environment boundary, not one per app; cross-workspace queries are a tax
+- Table plans control cost: **Analytics** for alerting and dashboards, **Basic / Auxiliary** for high-volume logs you rarely query
+- Set retention per table; keep long-term data in long-term retention instead of paying analytics prices for it
+
+### Collect at Scale — Policy, DCRs, and the Monitor Agent
+- Don't hand-configure diagnostic settings per resource — assign **DeployIfNotExists** policies at the landing zone so every new resource is wired at birth
+- Built-in policies enable logging by **category group** (`audit` or `allLogs`) — choosing between them is a cost decision
+- VMs and Arc servers use the **Azure Monitor Agent** with data collection rules; the legacy Log Analytics (MMA) agent retired Aug 31, 2024
+
+### Alerts That Wake the Right Person
+- Alert on **symptoms users feel** (errors, latency, availability), not every cause — noisy alerts train people to ignore them
+- **Metric alerts** are fast (about a minute); **log alerts** are richer (who, what, from where) but slower — use both, deliberately
+- **Action groups** route to email, SMS, push, webhooks, ITSM, or a runbook; every alert needs an owner and a next step
+
+### Application Insights & OpenTelemetry
+- Workspace-based Application Insights keeps app telemetry in the same Log Analytics workspace as platform logs — one query surface
+- The **Azure Monitor OpenTelemetry Distro** is the instrumentation default for new code — vendor-neutral, no proprietary SDK lock-in
+- Distributed tracing turns "the app is slow" into "this dependency call is slow" — a Performance Efficiency conversation with evidence
+
+### Cost Management — Budgets Are Alerts Too
+- **Budgets** at subscription and resource-group scope, on actual *and* forecasted spend, routed to the same action groups as ops alerts
+- **Anomaly alerts** catch the runaway resource before month-end does
+- Cost data lags by hours — budgets are a governance control, not a real-time circuit breaker
+
+### FinOps — Make Cost Somebody's Job
+- Tags + Cost Management give showback and chargeback by team; untagged spend is unowned spend
+- **Azure Advisor** cost recommendations (rightsizing, idle resources, reservation and savings plan coverage) on a monthly review cadence
+- Export cost data in the **FOCUS** format and use the FinOps toolkit for reporting across subscriptions, clouds, and time
+
+### Demonstration — Observability & Cost Guardrails
+- Diagnostic settings deployed by policy, not by hand
+- Generate denied requests, find them in KQL, and get the alert on your phone
+- A budget routed to the same action group
 
 ---
 
 ## Closing
 
-### Slide: The Architect's WAF Checklist
-- **Reliability:** RTO/RPO defined, zones/regions chosen to match, recovery tested
-- **Security:** Zero Trust, identity-as-perimeter, private endpoints, no standing privilege, encryption with CMK
-- **Cost Optimization:** reservations + savings plans, tagging/chargeback, lifecycle + budgets with alerts
-- **Operational Excellence:** IaC (Bicep/Terraform), pipelines, runbooks, observability
+### The Same Rules Apply to AI Workloads
+- An AI app is still a workload: private endpoints for model endpoints, managed identity instead of API keys, diagnostic logs on by default
+- Cost is per token — model choice, caching, and provisioned vs. pay-as-you-go throughput are the new right-sizing
+- Reliability means quota and region planning for model capacity; Security adds prompt injection and content filtering to the threat model
+
+### The Architect's WAF Checklist
+- **Reliability:** RTO/RPO defined, zones/regions chosen to match, backups immutable, recovery tested and timed
+- **Security:** Zero Trust, identity-as-perimeter, private endpoints, no standing privilege, no secrets in pipelines, encryption with CMK
+- **Cost Optimization:** reservations + savings plans, tagging/chargeback, budgets + anomaly alerts, lifecycle policies
+- **Operational Excellence:** IaC (Bicep/Terraform) through pipelines, diagnostics by policy, alerts with owners, runbooks
 - **Performance Efficiency:** right-size to real demand, match service to workload, scale on thresholds
 
-### Slide: From Admin to Architect — Where to Start Monday
+### From Admin to Architect — Where to Start Monday
 - Run an Azure Well-Architected Review on one real workload — score, don't guess
-- Pick the three highest-risk gaps (often: public exposure, standing admin, untested DR) and close them
+- Pick the three highest-risk gaps (often: public exposure, standing admin, untested restore) and close them
 - Move one manual process to IaC or automation — build the habit, then scale it
-
----
-
-A note on the biggest substantive changes: I promoted **identity and Zero Trust** to a through-line (Conditional Access, PIM, managed identities, Entra-ID-first data access), modernized the **storage security** story away from keys/SAS toward Entra ID and private endpoints, **retired the classic admin-role and Availability-Set-first** framing, added **IaC, CAF landing zones, Savings Plans, Front Door, and a 2026 reliability/multi-region reminder**, and reframed Synapse around Fabric. I consolidated the four HA slides and the repetitive admin-role slides to tighten the flow.
-
-Want this as a downloadable markdown file or a Word doc you can mark up?

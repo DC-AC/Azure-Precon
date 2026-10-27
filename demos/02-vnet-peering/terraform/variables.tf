@@ -56,9 +56,13 @@ variable "deploy_test_vms" {
 }
 
 variable "vm_size" {
-  description = "Size for the connectivity-test VMs. B1s is the cheapest broadly available option."
+  description = <<-EOT
+    Size for the connectivity-test VMs. B2ats_v2 is the cheapest current-generation
+    burstable size. The original B-series (B1s and friends) is announced for
+    retirement in November 2028 and is already capacity-restricted in some regions.
+  EOT
   type        = string
-  default     = "Standard_B1s"
+  default     = "Standard_B2ats_v2"
 }
 
 variable "admin_username" {
@@ -84,7 +88,7 @@ variable "deploy_vpn_gateway" {
     Deploy a VPN gateway in the hub and turn on gateway transit / use-remote-gateways
     on the peerings.
 
-    WARNING: a VpnGw1 takes 30-45 minutes to provision and costs roughly $0.19/hour.
+    WARNING: a VpnGw1AZ takes 30-45 minutes to provision and costs roughly $0.19/hour.
     Deploy it the day before if you want the gateway-transit part of the slide, or
     leave it false and talk through the peering settings instead.
   EOT
@@ -93,9 +97,20 @@ variable "deploy_vpn_gateway" {
 }
 
 variable "vpn_gateway_sku" {
-  description = "VPN gateway SKU. VpnGw1 is the cheapest route-based option."
+  description = <<-EOT
+    VPN gateway SKU. VpnGw1AZ is the cheapest route-based option.
+
+    Must be an AZ SKU. Azure stopped creating the non-AZ VpnGw1-5 SKUs on
+    1 November 2025 and retired them on 30 September 2026 — the public IP in
+    main.tf is already zone-redundant to match.
+  EOT
   type        = string
-  default     = "VpnGw1"
+  default     = "VpnGw1AZ"
+
+  validation {
+    condition     = can(regex("^VpnGw[1-5]AZ$", var.vpn_gateway_sku))
+    error_message = "Use an AZ SKU (VpnGw1AZ-VpnGw5AZ). Non-AZ VPN gateway SKUs can no longer be created."
+  }
 }
 
 variable "deploy_bastion" {
