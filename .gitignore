@@ -1,0 +1,5 @@
+# Exported decks — the .pptx is the tracked copy
+*.pdf
+
+# Office lock files (present while a document is open)
+~$*

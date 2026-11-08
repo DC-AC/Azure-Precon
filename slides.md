@@ -38,6 +38,37 @@
 
 ---
 
+## AI-Assisted IaC — Clickops Should Die
+
+### The Old Excuse for Clickops Is Gone
+- Clickops survived on one argument: the portal was faster than writing Terraform or Bicep from scratch
+- AI coding assistants (GitHub Copilot, Claude Code, and others) turn a sentence, a whiteboard sketch, or an existing resource into a working first draft in minutes
+- When doing it right costs about the same as doing it fast, the portal stops being a shortcut — it becomes a choice to be unreviewable
+
+### The Architect's Job Moves from Typing to Reviewing
+- You supply what AI can't guess: requirements, constraints, and trade-offs — RTO, budget, naming, tagging, "no public endpoints"
+- The AI drafts; **`terraform plan` is the contract** — read the diff, not the prose
+- The skill that matters is review: least privilege, blast radius, cost, and what happens on `destroy`
+- AI is just as good at the unglamorous work: explaining inherited code, refactoring into modules, writing the README and the runbook
+
+### Clickops Should Die — Even for "Just This Once"
+- If a change takes a minute to describe, it takes a minute to codify — a "quick portal fix" is now drift you chose
+- Brownfield is no excuse: **Azure Export for Terraform** (`aztfexport`) captures what exists, and AI cleans it into modules and variables
+- Make production read-only for humans: Reader by default, changes through pipelines, break-glass through PIM
+- The portal is still the best place to *look* — explore, troubleshoot, learn — then write it down as code
+
+### Guardrails for AI-Written Infrastructure
+- Treat AI output like a new engineer's pull request: plan, review, policy check, merge — **AI proposes, the pipeline applies**
+- Pin providers and modules (commit the lock file); prefer **Azure Verified Modules** over invented resource arguments
+- Let machines check machines: `terraform validate`, linters, and policy-as-code (Azure Policy, Checkov, OPA) catch what a tired reviewer misses
+- Keep secrets and tenant data out of prompts; the pipeline deploys with workload identity, not your AI tool's session
+
+### Case Study: This Precon's Architecture
+
+![Seven independent Terraform stacks in one subscription — drafted with AI, reviewed by a human, rebuilt with one script](images/precon-architecture.png)
+
+---
+
 ## Section 1 — Reliability, High Availability & Recovery
 
 ### Designing for Reliability — Start with the Targets
@@ -77,7 +108,7 @@
 
 ---
 
-## Section 2 — Azure SQL & Data Platform
+## Section 2 — Azure SQL, Fabric & Data Platform
 
 ### Azure SQL — Deployment Models
 - Single database, elastic pool, managed instance — different isolation and consolidation profiles
@@ -110,6 +141,16 @@
 - **Active geo-replication** gives readable secondaries; **failover groups** add a stable listener and fail over a set of databases together
 - Choose backup storage redundancy (LRS / ZRS / GRS) deliberately — it decides whether geo-restore is even possible
 
+### Vectors in Azure SQL — AI-Ready Without a New Database
+- Native `VECTOR` type, **DiskANN vector indexes**, and `VECTOR_SEARCH` — generally available as of September 2026
+- Embeddings live next to the relational data they describe: same security, same backups, same HA, no extra datastore to govern
+- The architect's question: does this workload need a dedicated vector store, or just a vector column?
+
+### Demonstration — Azure SQL, Locked Down
+- Entra-only authentication: no SQL password exists anywhere
+- Turn off public access live; the app keeps working through its private endpoint
+- Point-in-time restore, timed — that's your RTO, measured
+
 ### Azure DB for PostgreSQL & MySQL
 - **Flexible Server** is the only deployment option now — Single Server was retired (MySQL 2024, PostgreSQL 2025)
 - Zone-redundant HA, read replicas, burstable-to-business-critical tiers
@@ -121,21 +162,46 @@
 - RU-based throughput — performance and cost are the same dial; size it deliberately
 - Performance Efficiency: pick the consistency level that meets correctness needs at lowest latency/cost
 
-### Vectors in Azure SQL — AI-Ready Without a New Database
-- Native `VECTOR` type, **DiskANN vector indexes**, and `VECTOR_SEARCH` — generally available as of September 2026
-- Embeddings live next to the relational data they describe: same security, same backups, same HA, no extra datastore to govern
-- The architect's question: does this workload need a dedicated vector store, or just a vector column?
-
 ### Where Synapse Fits Now
 - The old "what's not suitable for Synapse" framing still holds — it's not for OLTP, singleton selects, or row-by-row work
 - New analytics investment defaults to **Microsoft Fabric**; Synapse is supported but shrinking (trusted-services firewall exception retired Aug 2026; Synapse Link for Cosmos DB closed to new accounts)
-- **Fabric mirroring** replicates Azure SQL, Managed Instance, and Cosmos DB into OneLake without ETL — the on-ramp for operational data
+- The **Migration Assistant for Fabric Data Warehouse** (GA) moves dedicated SQL pool schema and data, and flags the T-SQL it can't convert
 - For an admin-to-architect audience: don't start new analytics builds on Synapse
 
-### Demonstration — Azure SQL, Locked Down
-- Entra-only authentication: no SQL password exists anywhere
-- Turn off public access live; the app keeps working through its private endpoint
-- Point-in-time restore, timed — that's your RTO, measured
+### Microsoft Fabric — Analytics as SaaS
+- One SaaS platform for the analytics estate: Data Factory, Spark, Data Warehouse, Real-Time Intelligence, Data Science, databases, and Power BI — one capacity, one security model, one lake
+- Shared responsibility shifts again: no clusters, VNets, or storage accounts to build — you own **capacity sizing, workspace design, access, and governance**
+- **Fabric IQ** (GA in Microsoft Copilot) and data agents answer questions from your semantic models — model quality is now AI quality
+- The architect's question changes from "which service?" to "which engine for this workload, and whose capacity pays for it?"
+
+### OneLake — One Copy, Many Engines
+- One lake per tenant, organized by workspace; tables land as open **Delta Parquet**
+- Spark, the SQL analytics endpoint, KQL, and Power BI **Direct Lake** read the same files — no copy per engine, no import refresh
+- **Shortcuts** virtualize ADLS Gen2, S3, GCS, Dataverse, and other workspaces in place — a copy becomes a decision, not a default
+- Data lives in the region of the workspace's capacity — plan residency and multi-geo before the first workspace, not after
+
+### Mirroring & Fabric Databases — Operational Data Without ETL
+- **Mirroring** continuously replicates Azure SQL, Managed Instance, SQL Server, Cosmos DB, Snowflake, BigQuery, and more into OneLake as Delta — no pipelines to build or babysit
+- Replication compute is free, and each capacity unit includes 1 TB of free mirrored storage (F64 = 64 TB) — you pay for the queries
+- **SQL database** and **Cosmos DB in Fabric** (GA since Nov 2025) are operational databases that mirror themselves — the shortest path from app data to analytics
+- Trade-off: a Fabric database shares its capacity with every other workload on it — Azure SQL still wins for isolated performance, elastic pools, failover groups, or Managed Instance compatibility
+
+### Fabric Capacity Is the Architecture Decision
+- Every workload draws from one pool of **capacity units (CUs)** — F SKUs from F2 up, pay-as-you-go with pause/resume, or reserved for roughly 40% off
+- **Smoothing** spreads bursts over time; sustained overuse means **throttling** — interactive delays first, then rejections. Surge protection and capacity overage are guardrails, not a substitute for sizing
+- Separate capacities by environment and criticality — month-end finance reporting shouldn't queue behind someone's exploratory notebook
+- Power BI Premium P SKUs are retiring; the **Capacity Metrics app** is both your sizing tool and your chargeback data
+
+### Securing & Governing Fabric
+- Entra ID and Conditional Access front the whole platform; workspace roles → item permissions → **OneLake security** roles that define access once, on the data, for every engine
+- Network: tenant- and **workspace-level Private Link** inbound; **outbound access protection** with managed private endpoints; trusted workspace access to firewalled storage
+- **Workspace identity** is Fabric's managed identity — connections to Azure resources without stored secrets; **customer-managed keys** for workspace encryption
+- **Microsoft Purview** built in: sensitivity labels that follow data into exports, lineage, DLP, and the OneLake catalog
+
+### Fabric as Code — Git, Deployment Pipelines, Terraform
+- **Git integration** (Azure DevOps or GitHub) versions workspace items; **deployment pipelines** promote dev → test → prod; **variable libraries** carry per-environment values
+- The **Terraform provider for Microsoft Fabric** (GA) manages workspaces, role assignments, and items; `azurerm_fabric_capacity` manages the capacity itself
+- Same rule as the rest of the estate: a workspace built by clicking can't be reviewed, reproduced, or rolled back
 
 ---
 

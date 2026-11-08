@@ -11,7 +11,7 @@ decision with a cost, not a feature with a checkbox.
 
 **Audience:** experienced Azure and Windows/SQL administrators moving into
 architecture or platform roles.
-**Format:** 80 slides across 10 sections, with 7 scripted live demos — about
+**Format:** 91 slides across 11 sections, with 7 scripted live demos — about
 6½ hours of material for an 8:30–4:30 day.
 
 ---
@@ -23,6 +23,7 @@ architecture or platform roles.
 | [slides.md](slides.md) | The deck — every slide, in delivery order, as speaker-ready bullets |
 | [demos/](demos/) | Terraform + run-of-show scripts for the seven **Demonstration** slides |
 | [demos/README.md](demos/README.md) | Demo index: slide map, prerequisites, blast radius, precon-day schedule, cost |
+| [images/](images/) | The demo architecture diagram used in the deck — `.svg` source and the `.png` the deck embeds |
 
 ---
 
@@ -34,8 +35,9 @@ from, not sentences you read aloud.
 | Section | Slides | What it covers |
 |---|---|---|
 | **Opening & Framing** | 6 | The mindset shift, the five WAF pillars as the language of trade-offs, why lift-and-shift carries on-prem assumptions forward, shared responsibility, and IaC (with Azure Verified Modules) as the architect's default |
+| **AI-Assisted IaC — Clickops Should Die** | 5 | Why AI removes the last excuse for clickops, the architect's job moving from typing to reviewing, brownfield export with `aztfexport`, guardrails for AI-written infrastructure, and this precon's own architecture as the case study |
 | **1 — Reliability, High Availability & Recovery** | 7 | Start from RTO/RPO, not from redundancy. Availability Zones as the modern default, scale sets, a multi-region reality check, ransomware-proof backup, Site Recovery, and testing the failure with Chaos Studio |
-| **2 — Azure SQL & Data Platform** | 11 | Deployment models, Hyperscale, serverless vs. provisioned, Managed Instance security posture, HA tiers, restore as the real test, PostgreSQL/MySQL Flexible Server, Cosmos DB, vectors in Azure SQL, Synapse vs. Fabric — and a demo |
+| **2 — Azure SQL, Fabric & Data Platform** | 17 | Deployment models, Hyperscale, serverless vs. provisioned, Managed Instance security posture, HA tiers, restore as the real test, vectors in Azure SQL — and a demo. Then PostgreSQL/MySQL, Cosmos DB, Synapse, and six slides on Microsoft Fabric: OneLake, mirroring and Fabric databases, capacity, security and governance, and Fabric as code |
 | **3 — Governance** | 11 | Management group hierarchy, Azure landing zones, tagging, RBAC, PIM and just-in-time access, access reviews, and Azure Policy as compliance-as-code |
 | **4 — Networking & Network Security** | 12 | Zero Trust framing (identity is the perimeter), explicit outbound now that new VNets are private by default, private endpoints and Network Security Perimeter, hub-and-spoke, load balancing, WAF, Firewall, NSGs/ASGs, and Bastion |
 | **5 — Virtual Machines & Storage** | 7 | The architect's VM checklist, sizing and retirements, the compute + storage cost model, Premium SSD v2 for SQL, encryption at host, and moving storage access past keys and SAS |
@@ -48,23 +50,24 @@ from, not sentences you read aloud.
 
 | Time | Block | Demo |
 |---|---|---|
-| 8:30 | Opening & Framing | |
-| 9:00 | 1 — Reliability, High Availability & Recovery | |
-| 9:30 | 2 — Azure SQL & Data Platform | 06 |
-| 10:30 | *Break* | |
-| 10:45 | 3 — Governance | 01 |
-| 11:35 | 4 — Networking & Network Security | 02 |
-| 12:30 | *Lunch* | |
-| 1:30 | 5 — Virtual Machines & Storage | |
-| 2:00 | 6 — Identity, Secrets & Security Posture | 03 |
-| 2:45 | *Break* | |
-| 3:00 | 7 — Automation & Serverless | 04, 05 |
+| 8:30 | Opening & Framing, AI-Assisted IaC | |
+| 9:10 | 1 — Reliability, High Availability & Recovery | |
+| 9:35 | 2 — Azure SQL, Fabric & Data Platform | 06 |
+| 10:50 | *Break* | |
+| 11:05 | 3 — Governance | 01 |
+| 11:50 | 4 — Networking & Network Security | 02 |
+| 12:40 | *Lunch* | |
+| 1:40 | 5 — Virtual Machines & Storage | |
+| 2:05 | 6 — Identity, Secrets & Security Posture | 03 |
+| 2:50 | *Break* | |
+| 3:05 | 7 — Automation & Serverless | 04, 05 |
 | 3:40 | 8 — Operations: Observability & Cost | 07 |
-| 4:20 | Closing, Q&A | |
+| 4:15 | Closing, Q&A | |
 
-The timings assume about 3½ minutes a slide plus questions. If you run long, the
-cheapest cuts are demo 05 and the Front Door, Firewall and storage-services slides.
-None of them carries a through-line.
+The day is full: the timings assume about 3½ minutes a slide plus questions. If
+you run long, the cheapest cuts are demo 05 and the Front Door, Firewall and
+storage-services slides. None of them carries a through-line. For a data-heavy
+room, give the Fabric block in Section 2 the time and take it from Sections 5 and 7.
 
 ### Through-lines
 
@@ -111,6 +114,12 @@ The October 2026 refresh added:
   encryption at host; B2C closed to new customers; Key Vault RBAC as the default;
   retired Automation runtimes; Linux Consumption retiring in favour of Flex Consumption
 - **Demo 02 now deploys an AZ VPN gateway SKU.** Non-AZ SKUs can no longer be created
+
+The November 2026 update added six **Microsoft Fabric** slides to Section 2 (now
+*Azure SQL, Fabric & Data Platform*) and moved the Azure SQL demo up so it follows
+the Azure SQL slides directly. It also added a short **AI-Assisted IaC** section
+after the opening — AI removes the last excuse for clickops — closing on a diagram
+of this precon's own demo architecture.
 
 ---
 
@@ -203,7 +212,8 @@ pandoc slides.md --slide-level=3 -o slides.pptx
 
 Slide breaks are `###` headings and section breaks are `##` headings — hence
 `--slide-level=3`. Most markdown presentation tools will split it correctly given
-the same hint.
+the same hint. Run pandoc from the repo root so the architecture slide finds
+`images/precon-architecture.png`.
 
 If you fork this for your own delivery, the parts most worth adapting are the
 `prefix` and `location` variables in each demo's `terraform.tfvars.example`, and
