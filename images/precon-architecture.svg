@@ -1,0 +1,151 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+<rect width="1920" height="1080" fill="#ffffff"/>
+<text x="40" y="62" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="34" font-weight="700" font-style="normal" fill="#1b1f24" text-anchor="start">Azure: From Admin to Architect — demo architecture</text>
+<text x="40" y="98" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="21" font-weight="400" font-style="normal" fill="#57606a" text-anchor="start">One subscription. Seven independent Terraform stacks, each with its own resource group, state and teardown.</text>
+<text x="40" y="160" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="17" font-weight="700" font-style="normal" fill="#57606a" text-anchor="start">HOW IT GETS BUILT</text>
+<rect x="40" y="180" width="330" height="118" rx="12" fill="#f1ebfd" stroke="#6d28d9" stroke-width="2.5"/>
+<text x="205.0" y="230" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" font-style="normal" fill="#6d28d9" text-anchor="middle">AI assistant</text>
+<text x="205.0" y="266" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="middle">drafts Terraform from intent</text>
+<rect x="40" y="353" width="330" height="118" rx="12" fill="#e8f1fb" stroke="#0f6cbd" stroke-width="2.5"/>
+<text x="205.0" y="403" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" font-style="normal" fill="#0f6cbd" text-anchor="middle">Human review</text>
+<text x="205.0" y="439" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="middle">terraform validate · plan · PR</text>
+<rect x="40" y="526" width="330" height="118" rx="12" fill="#e8f1fb" stroke="#0f6cbd" stroke-width="2.5"/>
+<text x="205.0" y="576" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" font-style="normal" fill="#0f6cbd" text-anchor="middle">GitHub repo</text>
+<text x="205.0" y="612" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="middle">providers pinned · no secrets</text>
+<rect x="40" y="699" width="330" height="118" rx="12" fill="#e8f1fb" stroke="#0f6cbd" stroke-width="2.5"/>
+<text x="205.0" y="749" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" font-style="normal" fill="#0f6cbd" text-anchor="middle">Presenter laptop</text>
+<text x="205.0" y="785" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="middle">az login (MFA) · deploy-all.sh</text>
+<rect x="40" y="872" width="330" height="118" rx="12" fill="#e9f6ec" stroke="#1a7f37" stroke-width="2.5"/>
+<text x="205.0" y="922" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" font-style="normal" fill="#1a7f37" text-anchor="middle">Azure Resource Manager</text>
+<text x="205.0" y="958" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="middle">the only way anything changes</text>
+<line x1="205.0" y1="302" x2="205.0" y2="347" stroke="#57606a" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="205.0" y1="475" x2="205.0" y2="520" stroke="#57606a" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="205.0" y1="648" x2="205.0" y2="693" stroke="#57606a" stroke-width="3" marker-end="url(#arrow)"/>
+<line x1="205.0" y1="821" x2="205.0" y2="866" stroke="#57606a" stroke-width="3" marker-end="url(#arrow)"/>
+<text x="205.0" y="1050" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="italic" fill="#57606a" text-anchor="middle">No portal clicks to rebuild any of it.</text>
+<rect x="410" y="140" width="1470" height="915" rx="18" fill="#fbfcfd" stroke="#0f6cbd" stroke-width="2.5" stroke-dasharray="10 8"/>
+<text x="434" y="180" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="24" font-weight="700" font-style="normal" fill="#0f6cbd" text-anchor="start">Azure subscription</text>
+<text x="660" y="180" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18.5" font-weight="400" font-style="normal" fill="#57606a" text-anchor="start">eastus2 · every resource tagged Workload=AzurePrecon · delivery order, left to right</text>
+<line x1="374" y1="931.0" x2="402" y2="931.0" stroke="#57606a" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="432.0" y="206" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M432.0,218 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="450.0" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">06</text>
+<text x="494.0" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">Azure SQL, Locked Down</text>
+<text x="450.0" y="302" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-sql-*</text>
+<text x="755.5" y="302" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 2</text>
+<circle cx="456.0" cy="340" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="346" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">SQL server, Entra-only auth</text>
+<circle cx="456.0" cy="384" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="390" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Serverless DB, sample data</text>
+<circle cx="456.0" cy="428" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="434" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Private endpoint + private DNS</text>
+<circle cx="456.0" cy="472" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="478" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">VNet-integrated function, MI</text>
+<line x1="450.0" y1="539" x2="755.5" y2="539" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="450.0" y="575" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">No password. No public path.</text>
+<rect x="793.5" y="206" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M793.5,218 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="811.5" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">01</text>
+<text x="855.5" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">Policy &amp; Compliance</text>
+<text x="811.5" y="302" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-*-policy-*</text>
+<text x="1117.0" y="302" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 3</text>
+<circle cx="817.5" cy="340" r="4" fill="#0f6cbd"/>
+<text x="831.5" y="346" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Initiative: 2 custom + 1 built-in</text>
+<circle cx="817.5" cy="384" r="4" fill="#0f6cbd"/>
+<text x="831.5" y="390" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">RG assignment, DoNotEnforce</text>
+<circle cx="817.5" cy="428" r="4" fill="#0f6cbd"/>
+<text x="831.5" y="434" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">stgood / stbad storage</text>
+<line x1="811.5" y1="539" x2="1117.0" y2="539" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="811.5" y="575" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">Shows what Deny would block</text>
+<rect x="1155.0" y="206" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M1155.0,218 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="1173.0" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">02</text>
+<text x="1217.0" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">VNet Peering</text>
+<text x="1173.0" y="302" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-net-*</text>
+<text x="1478.5" y="302" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 4</text>
+<circle cx="1179.0" cy="340" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="346" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Hub + two spoke VNets</text>
+<circle cx="1179.0" cy="384" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="390" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Peerings — no spoke↔spoke</text>
+<circle cx="1179.0" cy="428" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="434" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">3 VMs, zero public IPs</text>
+<circle cx="1179.0" cy="472" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="478" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Optional VPN gateway, Bastion</text>
+<line x1="1173.0" y1="539" x2="1478.5" y2="539" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="1173.0" y="575" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">Peering is non-transitive</text>
+<rect x="1516.5" y="206" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M1516.5,218 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="1534.5" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">03</text>
+<text x="1578.5" y="248" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">Key Vault Rotation</text>
+<text x="1534.5" y="302" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-kv-*</text>
+<text x="1840.0" y="302" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 6</text>
+<circle cx="1540.5" cy="340" r="4" fill="#0f6cbd"/>
+<text x="1554.5" y="346" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Key Vault, RBAC mode</text>
+<circle cx="1540.5" cy="384" r="4" fill="#0f6cbd"/>
+<text x="1554.5" y="390" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Certificate auto-renews at 80%</text>
+<circle cx="1540.5" cy="428" r="4" fill="#0f6cbd"/>
+<text x="1554.5" y="434" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">App identity, no secret</text>
+<circle cx="1540.5" cy="472" r="4" fill="#0f6cbd"/>
+<text x="1554.5" y="478" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Event Grid → storage queue</text>
+<line x1="1534.5" y1="539" x2="1840.0" y2="539" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="1534.5" y="575" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">A renewal nobody has to do</text>
+<rect x="432.0" y="623" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M432.0,635 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="450.0" y="665" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">04</text>
+<text x="494.0" y="665" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">Function App</text>
+<text x="450.0" y="719" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-func-*</text>
+<text x="755.5" y="719" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 7</text>
+<circle cx="456.0" cy="757" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="763" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Flex Consumption (FC1)</text>
+<circle cx="456.0" cy="801" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="807" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Storage via managed identity</text>
+<circle cx="456.0" cy="845" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="851" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">User + system identities</text>
+<circle cx="456.0" cy="889" r="4" fill="#0f6cbd"/>
+<text x="470.0" y="895" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Application Insights</text>
+<line x1="450.0" y1="956" x2="755.5" y2="956" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="450.0" y="992" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">Find the connection string</text>
+<rect x="793.5" y="623" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M793.5,635 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="811.5" y="665" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">05</text>
+<text x="855.5" y="665" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">Logic App</text>
+<text x="811.5" y="719" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-logic-*</text>
+<text x="1117.0" y="719" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 7</text>
+<circle cx="817.5" cy="757" r="4" fill="#0f6cbd"/>
+<text x="831.5" y="763" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Consumption workflow</text>
+<circle cx="817.5" cy="801" r="4" fill="#0f6cbd"/>
+<text x="831.5" y="807" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">HTTP trigger → If → Response</text>
+<circle cx="817.5" cy="845" r="4" fill="#0f6cbd"/>
+<text x="831.5" y="851" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Managed identity → queue</text>
+<line x1="811.5" y1="956" x2="1117.0" y2="956" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="811.5" y="992" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">The business rule is a diff</text>
+<rect x="1155.0" y="623" width="341.5" height="395" rx="12" fill="#ffffff" stroke="#c9d1d9" stroke-width="2"/>
+<path d="M1155.0,635 a12,12 0 0 1 12,-12 h317.5 a12,12 0 0 1 12,12 v52 h-341.5 z" fill="#0f6cbd"/>
+<text x="1173.0" y="665" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" font-style="normal" fill="#ffffff" text-anchor="start">07</text>
+<text x="1217.0" y="665" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" font-style="normal" fill="#ffffff" text-anchor="start">Observability &amp; Cost</text>
+<text x="1173.0" y="719" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="18" font-weight="500" font-style="normal" fill="#57606a" text-anchor="start">rg-obs-*</text>
+<text x="1478.5" y="719" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="18" font-weight="600" font-style="normal" fill="#0f6cbd" text-anchor="end">Section 8</text>
+<circle cx="1179.0" cy="757" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="763" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Policy deploys diagnostics</text>
+<circle cx="1179.0" cy="801" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="807" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Log Analytics + saved KQL</text>
+<circle cx="1179.0" cy="845" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="851" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Metric + log alerts</text>
+<circle cx="1179.0" cy="889" r="4" fill="#0f6cbd"/>
+<text x="1193.0" y="895" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Action group + budget</text>
+<line x1="1173.0" y1="956" x2="1478.5" y2="956" stroke="#c9d1d9" stroke-width="1.5"/>
+<text x="1173.0" y="992" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19.5" font-weight="600" font-style="italic" fill="#1a7f37" text-anchor="start">Wired at birth, pages a human</text>
+<rect x="1516.5" y="623" width="341.5" height="395" rx="12" fill="#e9f6ec" stroke="#1a7f37" stroke-width="2"/>
+<text x="1538.5" y="669" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="24" font-weight="700" font-style="normal" fill="#1a7f37" text-anchor="start">By the numbers</text>
+<text x="1538.5" y="723" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="28" font-weight="800" font-style="normal" fill="#1b1f24" text-anchor="start">7</text>
+<text x="1646.5" y="721" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">independent stacks</text>
+<text x="1538.5" y="779" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="28" font-weight="800" font-style="normal" fill="#1b1f24" text-anchor="start">111</text>
+<text x="1646.5" y="777" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">Terraform resources</text>
+<text x="1538.5" y="835" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="28" font-weight="800" font-style="normal" fill="#1b1f24" text-anchor="start">~3,500</text>
+<text x="1646.5" y="833" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">lines of Terraform</text>
+<text x="1538.5" y="891" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="28" font-weight="800" font-style="normal" fill="#1b1f24" text-anchor="start">0</text>
+<text x="1646.5" y="889" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">secrets in the repo</text>
+<text x="1538.5" y="947" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="28" font-weight="800" font-style="normal" fill="#1b1f24" text-anchor="start">2</text>
+<text x="1646.5" y="945" font-family="'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="19" font-weight="400" font-style="normal" fill="#1b1f24" text-anchor="start">scripts: build, tear down</text>
+</svg>
