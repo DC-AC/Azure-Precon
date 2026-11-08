@@ -16,7 +16,7 @@ delivery order: **06**, 01, 02, 03, 04, 05, **07**.
 
 | # | Demo | Deck slide | Section | Live time |
 |---|---|---|---|---|
-| 06 | [Azure SQL, Locked Down](06-azure-sql-private/) | *Demonstration — Azure SQL, Locked Down* | 2 — Azure SQL & Data Platform | 12–15 min |
+| 06 | [Azure SQL, Locked Down](06-azure-sql-private/) | *Demonstration — Azure SQL, Locked Down* | 2 — Azure SQL, Fabric & Data Platform | 12–15 min |
 | 01 | [Policy & Compliance](01-policy-compliance/) † | *Demonstration — Policy & Compliance* | 3 — Governance | 8–10 min |
 | 02 | [VNet Peering](02-vnet-peering/) | *Demonstration — VNet Peering* | 4 — Networking | 10–12 min |
 | 03 | [Key Vault Cert Auto-Rotation](03-keyvault-cert-rotation/) | *Demonstration — Certificate Auto-Rotation in Key Vault* | 6 — Identity, Secrets & Security Posture | 8–10 min |

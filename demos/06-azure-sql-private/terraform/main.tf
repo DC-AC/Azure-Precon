@@ -1,7 +1,7 @@
 ###############################################################################
 # Demo 06 — Azure SQL, Locked Down
 #
-# Slide: "Demonstration — Azure SQL, Locked Down" (Section 2, Azure SQL & Data Platform)
+# Slide: "Demonstration — Azure SQL, Locked Down" (Section 2, Azure SQL, Fabric & Data Platform)
 #   - Entra-only authentication: no SQL password exists anywhere
 #   - Turn off public access live; the app keeps working through its private endpoint
 #   - Point-in-time restore, timed — that's your RTO, measured

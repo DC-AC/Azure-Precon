@@ -1,12 +1,12 @@
 # Demo 06 — Azure SQL, Locked Down
 
-**Deck slide:** *Demonstration — Azure SQL, Locked Down* (Section 2 — Azure SQL & Data Platform)
+**Deck slide:** *Demonstration — Azure SQL, Locked Down* (Section 2 — Azure SQL, Fabric & Data Platform)
 
 > - Entra-only authentication: no SQL password exists anywhere
 > - Turn off public access live; the app keeps working through its private endpoint
 > - Point-in-time restore, timed — that's your RTO, measured
 
-**Runs after:** *Where Synapse Fits Now* — but beat 0 starts at *Business Continuity for Azure SQL — Restore Is the Test*
+**Runs after:** *Vectors in Azure SQL* — but beat 0 starts at the first slide of Section 2, *Azure SQL — Deployment Models*
 **Length:** 12–15 minutes live (plus pre-flight)
 **WAF pillars on screen:** Security, Reliability, Cost Optimization
 
@@ -117,7 +117,7 @@ az functionapp function list -g "$(terraform output -raw resource_group_name)" \
 
 ## Run of show
 
-### 0. Start the clock *(30 seconds — at the "Business Continuity for Azure SQL" slide)*
+### 0. Start the clock *(30 seconds — at the top of Section 2)*
 
 Open a second terminal:
 
@@ -130,7 +130,8 @@ eval "$(terraform output -raw restore_command)"
 > database. I'm not going to guess how long that takes. When we get to the demo,
 > this terminal will tell us."
 
-Leave it running and go back to the slides.
+Leave it running and go back to the slides. Starting here rather than at the
+*Business Continuity* slide gives the restore half an hour — plenty for this size.
 
 ### 1. The server with no password *(2 min)*
 
