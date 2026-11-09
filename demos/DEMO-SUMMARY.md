@@ -170,7 +170,8 @@ and Event Grid delivering certificate events to a storage queue.
    → thumbprint after → `az keyvault certificate list-versions …`: new thumbprint,
    two versions, new expiry.
 5. **The event nobody has to watch for** — `eval "$(terraform output -raw peek_events_command)"`
-   → `CertificateNewVersionCreated` waiting in the queue.
+   → one decoded line per event: a second `CertificateNewVersionCreated`, timestamped
+   a minute ago.
 
 **Reset afterwards:** nothing — extra versions are harmless.
 

@@ -194,7 +194,7 @@ one-page-per-demo version to keep open while you present.
 | [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) | ≥ 2.60 | All demos |
 | [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) | v4 | Demos 01 and 05 |
 | [go-sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/go-sqlcmd-utility) | any recent | Demo 01 only |
-| `jq` | any | Nicer output in a few demo commands |
+| `jq` | any | Demo 04's event peek; nicer output in a few other demo commands |
 
 An Azure subscription you can create resource groups in. Demos 01 and 04–07 create role
 assignments scoped to resources they create, so those need `Owner` or
