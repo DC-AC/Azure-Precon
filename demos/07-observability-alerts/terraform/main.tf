@@ -36,6 +36,24 @@ resource "random_string" "suffix" {
 }
 
 locals {
+  # Resource group names follow rg-<demo>-<core tech>-<region>. Only globally
+  # unique names (storage, Key Vault, SQL, function apps) carry the random suffix.
+  region_codes = {
+    eastus         = "eus"
+    eastus2        = "eus2"
+    centralus      = "cus"
+    northcentralus = "ncus"
+    southcentralus = "scus"
+    westus         = "wus"
+    westus2        = "wus2"
+    westus3        = "wus3"
+    canadacentral  = "cac"
+    northeurope    = "neu"
+    westeurope     = "weu"
+    uksouth        = "uks"
+  }
+  region_code = lookup(local.region_codes, var.location, var.location)
+
   suffix = "${var.prefix}-${random_string.suffix.result}"
 
   # Built-in: "Enable logging by category group for Key vaults
@@ -61,7 +79,7 @@ locals {
 }
 
 resource "azurerm_resource_group" "this" {
-  name     = "rg-obs-${local.suffix}"
+  name     = "rg-demo07-monitor-${local.region_code}"
   location = var.location
   tags     = var.tags
 }

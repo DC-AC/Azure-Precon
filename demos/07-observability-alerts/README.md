@@ -14,7 +14,7 @@
 
 ## ⚠️ This stack enforces one policy — in its own resource group only
 
-Unlike demo 01, this assignment is **enforced**. DeployIfNotExists in DoNotEnforce
+Unlike demo 02, this assignment is **enforced**. DeployIfNotExists in DoNotEnforce
 mode does nothing at create time, and "at create time" is the point of the demo.
 What that means in practice:
 
@@ -135,9 +135,9 @@ built-in definition, then the **Remediation** tab.
 > people who've never heard of a diagnostic setting. That's the difference between
 > a standard and a hope."
 
-Callback to demo 01:
+Callback to demo 02:
 
-> "Demo 01 was Audit and Deny — tell me what's wrong, or stop it happening. This
+> "Demo 02 was Audit and Deny — tell me what's wrong, or stop it happening. This
 > is the third verb: *fix it*."
 
 And the cost choice hiding in the parameters:

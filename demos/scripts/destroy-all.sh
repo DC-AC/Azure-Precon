@@ -13,12 +13,12 @@ set -euo pipefail
 
 DEMOS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ALL_DEMOS=(
-  "01-policy-compliance"
-  "02-vnet-peering"
-  "03-keyvault-cert-rotation"
-  "04-function-app"
-  "05-logic-app"
-  "06-azure-sql-private"
+  "01-azure-sql-private"
+  "02-policy-compliance"
+  "03-vnet-peering"
+  "04-keyvault-cert-rotation"
+  "05-function-app"
+  "06-logic-app"
   "07-observability-alerts"
 )
 
@@ -79,6 +79,6 @@ for demo in "${PENDING[@]}"; do
 done
 
 echo "Done."
-echo "Note: a VPN gateway (demo 02) can take 10-20 minutes to finish deleting."
-echo "Note: if you ran demo 06's point-in-time restore, the restored database is not"
+echo "Note: a VPN gateway (demo 03) can take 10-20 minutes to finish deleting."
+echo "Note: if you ran demo 01's point-in-time restore, the restored database is not"
 echo "      in Terraform state - it is deleted with the server."
