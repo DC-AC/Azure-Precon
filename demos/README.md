@@ -114,7 +114,7 @@ Every demo README follows the same structure:
 | [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) | ≥ 2.60 | All demos |
 | [Azure Functions Core Tools v4](https://learn.microsoft.com/azure/azure-functions/functions-run-local) | v4 | Demos 01 and 05 |
 | [go-sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/go-sqlcmd-utility) | any recent | Demo 01 (`brew install sqlcmd`) |
-| `jq` | any | Nicer output in a few commands |
+| `jq` | any | Demo 04's event peek; nicer output in a few other commands |
 
 Provider versions are pinned in each stack's `.terraform.lock.hcl` — committed on
 purpose, so the stack you rehearsed is the stack you present.

@@ -49,11 +49,14 @@ output "rotate_now_command" {
 }
 
 output "peek_events_command" {
-  description = "Peek the rotation events that Event Grid delivered to the storage queue."
+  description = "Peek the rotation events that Event Grid delivered to the storage queue, decoded to one line each."
+  # Event Grid base64-encodes queue messages, so the raw peek is unreadable on
+  # a projector. Decode each one and keep the three fields worth pointing at.
   value = var.enable_event_grid ? join(" ", [
     "az storage message peek --queue-name", azurerm_storage_queue.cert_events[0].name,
     "--account-name", azurerm_storage_account.events[0].name,
-    "--auth-mode login --num-messages 10 -o json",
+    "--auth-mode login --num-messages 10 --only-show-errors --query \"[].content\" -o tsv",
+    "| while read -r m; do echo \"$m\" | base64 --decode | jq -c '{eventType, subject, eventTime}'; done",
   ]) : "enable_event_grid is false"
 }
 

@@ -174,7 +174,16 @@ New thumbprint. Two versions. New expiry date.
 eval "$(terraform output -raw peek_events_command)"
 ```
 
-A `Microsoft.KeyVault.CertificateNewVersionCreated` event is sitting in the queue.
+One line per event — Event Grid base64-encodes queue messages, so the command
+decodes them and keeps the type, the certificate and the time:
+
+```
+{"eventType":"Microsoft.KeyVault.CertificateNewVersionCreated","subject":"app-tls-cert","eventTime":"2026-11-09T01:03:16.1877283Z"}
+{"eventType":"Microsoft.KeyVault.CertificateNewVersionCreated","subject":"app-tls-cert","eventTime":"<a minute ago>"}
+```
+
+The first is from when Terraform created the certificate; the second is the
+rotation you just ran — point at its timestamp.
 
 > "Key Vault told Event Grid the moment that happened. The queue is just where I
 > parked it for the demo — in your environment that's a Logic App that reloads a
@@ -200,6 +209,7 @@ Show the subscription's other event types in the portal (**Events** → the subs
 | Rotation returns "pending" | Issuance is asynchronous | `az keyvault certificate pending show --vault-name $KV -n $CERT` — self-signed is usually instant |
 | Event queue is empty | Event Grid delivery lag | Wait ~60s and peek again; delivery is at-least-once, not instantaneous |
 | `az storage message peek` → `AuthorizationPermissionMismatch` / "required permissions" | The stack grants you **Storage Queue Data Reader** on the events account, but RBAC takes 1–2 minutes to apply | Wait and retry. Peek once in pre-flight so you know it works before you're on stage |
+| Peek → `jq: command not found` | The command decodes events with `jq` | `brew install jq` |
 | `terraform destroy` hangs on the vault | Purge protection got enabled | It cannot be disabled — the vault clears after the 7-day retention window |
 
 ---
