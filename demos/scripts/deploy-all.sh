@@ -11,12 +11,12 @@ set -euo pipefail
 
 DEMOS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ALL_DEMOS=(
-  "01-policy-compliance"
-  "02-vnet-peering"
-  "03-keyvault-cert-rotation"
-  "04-function-app"
-  "05-logic-app"
-  "06-azure-sql-private"
+  "01-azure-sql-private"
+  "02-policy-compliance"
+  "03-vnet-peering"
+  "04-keyvault-cert-rotation"
+  "05-function-app"
+  "06-logic-app"
   "07-observability-alerts"
 )
 
@@ -79,17 +79,17 @@ done
 cat <<'EOF'
 
 Reminders:
-  * Demo 01 is REPORT-ONLY by default - it cannot block or modify anything.
+  * Demo 01 needs your laptop's IP in client_ip_address, and its code deployed:
+      cd 01-azure-sql-private/src && func azure functionapp publish <app-name> --python
+    Deploy it the day before - point-in-time restore needs a completed first backup.
+  * Demo 02 is REPORT-ONLY by default - it cannot block or modify anything.
     Confirm with:
-      terraform -chdir=01-policy-compliance/terraform output mode
-  * Demo 01 needs a compliance scan before it shows anything:
+      terraform -chdir=02-policy-compliance/terraform output mode
+  * Demo 02 needs a compliance scan before it shows anything:
       az policy state trigger-scan --resource-group <rg>
-  * Demo 04 still needs the code deployed:
-      cd 04-function-app/src && func azure functionapp publish <app-name>
-  * Demo 02's VPN gateway is off by default (30-45 min to provision).
-  * Demo 06 needs your laptop's IP in client_ip_address, and its code deployed:
-      cd 06-azure-sql-private/src && func azure functionapp publish <app-name>
-    Deploy it the day before - point-in-time restore needs some history.
+  * Demo 03's VPN gateway is off by default (30-45 min to provision).
+  * Demo 05 still needs the code deployed:
+      cd 05-function-app/src && func azure functionapp publish <app-name> --python
   * Demo 07 needs alert_email and/or alert_sms_number in its terraform.tfvars,
     and deploys an ENFORCED DeployIfNotExists policy scoped to its own resource
     group. Give remediation 15-30 minutes before you present.

@@ -20,9 +20,11 @@ architecture or platform roles.
 
 | Path | What it is |
 |---|---|
-| [slides.md](slides.md) | The deck — every slide, in delivery order, as speaker-ready bullets |
+| [slides.md](slides.md) | The deck — every slide, in delivery order, as speaker-ready bullets. The source of truth for content |
+| [azure-precon-slides.pptx](azure-precon-slides.pptx) | The designed deck you present from: generated from `slides.md`, then styled by hand |
 | [demos/](demos/) | Terraform + run-of-show scripts for the seven **Demonstration** slides |
 | [demos/README.md](demos/README.md) | Demo index: slide map, prerequisites, blast radius, precon-day schedule, cost |
+| [demos/DEMO-SUMMARY.md](demos/DEMO-SUMMARY.md) | One page per demo — the point, pre-flight, and the steps in order |
 | [images/](images/) | The demo architecture diagram used in the deck — `.svg` source and the `.png` the deck embeds |
 
 ---
@@ -52,20 +54,20 @@ from, not sentences you read aloud.
 |---|---|---|
 | 8:30 | Opening & Framing, AI-Assisted IaC | |
 | 9:10 | 1 — Reliability, High Availability & Recovery | |
-| 9:35 | 2 — Azure SQL, Fabric & Data Platform | 06 |
+| 9:35 | 2 — Azure SQL, Fabric & Data Platform | 01 |
 | 10:50 | *Break* | |
-| 11:05 | 3 — Governance | 01 |
-| 11:50 | 4 — Networking & Network Security | 02 |
+| 11:05 | 3 — Governance | 02 |
+| 11:50 | 4 — Networking & Network Security | 03 |
 | 12:40 | *Lunch* | |
 | 1:40 | 5 — Virtual Machines & Storage | |
-| 2:05 | 6 — Identity, Secrets & Security Posture | 03 |
+| 2:05 | 6 — Identity, Secrets & Security Posture | 04 |
 | 2:50 | *Break* | |
-| 3:05 | 7 — Automation & Serverless | 04, 05 |
+| 3:05 | 7 — Automation & Serverless | 05, 06 |
 | 3:40 | 8 — Operations: Observability & Cost | 07 |
 | 4:15 | Closing, Q&A | |
 
 The day is full: the timings assume about 3½ minutes a slide plus questions. If
-you run long, the cheapest cuts are demo 05 and the Front Door, Firewall and
+you run long, the cheapest cuts are demo 06 and the Front Door, Firewall and
 storage-services slides. None of them carries a through-line. For a data-heavy
 room, give the Fabric block in Section 2 the time and take it from Sections 5 and 7.
 
@@ -105,7 +107,7 @@ The October 2026 refresh added:
 
 - **A new Section 8 — Operations: Observability & Cost**, and demo 07 to go with it
 - **Backup, Site Recovery and failure testing** in Section 1; **restore-as-the-test,
-  vectors and Fabric mirroring** in Section 2, with demo 06
+  vectors and Fabric mirroring** in Section 2, with demo 01
 - **Mandatory MFA, workload identity federation and Defender for Cloud** in Section 6
 - **Explicit outbound** as its own slide, now that new VNets are private by default
 - **Current-state corrections:** Hyperscale at 128 TB; Single Server retired;
@@ -113,13 +115,22 @@ The October 2026 refresh added:
   Balancer and App Gateway v1 retired; Azure Disk Encryption retiring in favour of
   encryption at host; B2C closed to new customers; Key Vault RBAC as the default;
   retired Automation runtimes; Linux Consumption retiring in favour of Flex Consumption
-- **Demo 02 now deploys an AZ VPN gateway SKU.** Non-AZ SKUs can no longer be created
+- **Demo 03 now deploys an AZ VPN gateway SKU.** Non-AZ SKUs can no longer be created
 
 The November 2026 update added six **Microsoft Fabric** slides to Section 2 (now
 *Azure SQL, Fabric & Data Platform*) and moved the Azure SQL demo up so it follows
 the Azure SQL slides directly. It also added a short **AI-Assisted IaC** section
 after the opening — AI removes the last excuse for clickops — closing on a diagram
 of this precon's own demo architecture.
+
+The demos were then deployed and run end to end against a live subscription. That
+shook out a handful of real bugs (all fixed — see each demo's *If it breaks*
+table), and two conventions changed: **demos are now numbered in delivery order**
+(the Azure SQL demo is 01), and **resource groups are named
+`rg-demoNN-<core tech>-<region>`** instead of carrying a random suffix. Every
+resource now carries the same six tags — `Workload`, `CostCenter`, `Environment`,
+`Demo`, `ManagedBy`, `Owner` — from one shared module, applied in place to the
+running demos. See [Conventions](demos/README.md#conventions).
 
 ---
 
@@ -131,12 +142,12 @@ seven, or whatever your timing allows.
 
 | # | Demo | Deck slide | What it proves |
 |---|---|---|---|
-| 06 | [Azure SQL, Locked Down](demos/06-azure-sql-private/) | Section 2 | No SQL password, no public address, and the app still works — plus an RTO you measured instead of guessed |
-| 01 | [Policy & Compliance](demos/01-policy-compliance/) | Section 3 | A Deny-capable policy running in report-only mode, showing exactly what it *would* have blocked before it blocks anything |
-| 02 | [VNet Peering](demos/02-vnet-peering/) | Section 4 | Hub-and-spoke connectivity works, spoke-to-spoke doesn't — peering is non-transitive, and you watch the ping fail |
-| 03 | [Key Vault Cert Rotation](demos/03-keyvault-cert-rotation/) | Section 6 | A certificate that renews itself, issues a fresh key pair, and raises an event nobody has to watch for |
-| 04 | [Function App](demos/04-function-app/) | Section 7 | Open the app settings blade and try to find the storage connection string. There isn't one |
-| 05 | [Logic App Workflow](demos/05-logic-app/) | Section 7 | Low-code is not un-architected: the workflow is deployed from Terraform and the business rule is a reviewable diff |
+| 01 | [Azure SQL, Locked Down](demos/01-azure-sql-private/) | Section 2 | No SQL password, no public address, and the app still works — plus an RTO you measured instead of guessed |
+| 02 | [Policy & Compliance](demos/02-policy-compliance/) | Section 3 | A Deny-capable policy running in report-only mode, showing exactly what it *would* have blocked before it blocks anything |
+| 03 | [VNet Peering](demos/03-vnet-peering/) | Section 4 | Hub-and-spoke connectivity works, spoke-to-spoke doesn't — peering is non-transitive, and you watch the ping fail |
+| 04 | [Key Vault Cert Rotation](demos/04-keyvault-cert-rotation/) | Section 6 | A certificate that renews itself, issues a fresh key pair, and raises an event nobody has to watch for |
+| 05 | [Function App](demos/05-function-app/) | Section 7 | Open the app settings blade and try to find the storage connection string. There isn't one |
+| 06 | [Logic App Workflow](demos/06-logic-app/) | Section 7 | Low-code is not un-architected: the workflow is deployed from Terraform and the business rule is a reviewable diff |
 | 07 | [Observability & Cost Guardrails](demos/07-observability-alerts/) | Section 8 | A vault that was logging from birth because policy said so, an alert on your phone, and a budget routed to the same people |
 
 Every demo README follows the same structure — the one takeaway, what the
@@ -145,14 +156,14 @@ timings, numbered beats with talk track and exact commands, a symptom → cause 
 fix table for when it breaks live, teardown, and approximate cost.
 
 The stacks also reach back to non-demo slides for free: Bastion and VPN gateways
-are flags on demo 02, managed identities appear in four different services
-across demos 03–06, and every stack is an excuse to put a `.tf` file next to a
+are flags on demo 03, managed identities appear in four different services
+across demos 01 and 04–06, and every stack is an excuse to put a `.tf` file next to a
 portal blade.
 
 ### Quick start
 
 ```bash
-az login
+az login                             # must be MFA-backed — see the note below
 az account set --subscription "<your-subscription-id>"
 
 cd demos
@@ -160,11 +171,20 @@ cd demos
 ./scripts/deploy-all.sh 01 05        # or just the ones you need
 ```
 
+> **Mandatory MFA.** Azure refuses create, update and delete calls from tokens
+> without an MFA claim. If `terraform apply` fails with `RequestDisallowedByAzure`
+> while plain `az` commands work, Terraform is still getting a cached non-MFA
+> token. The fix is `az logout`, then sign in again with the claims challenge —
+> the exact commands are in the
+> [Mandatory MFA note](demos/README.md#prerequisites).
+
 Read [demos/README.md](demos/README.md) before a live session — it has the
 day-before / T-60 / T-15 schedule, and the demos that need advance notice (a VPN
-gateway takes 30–45 minutes to provision; the function apps' first code publish
-does a slow remote build; demo 06's database needs a day of history to restore
-from; demo 07's policy remediation needs 15–30 minutes).
+gateway took 31 minutes to provision in testing; the function apps' first code
+publish does a remote build; demo 01's database can't be restored until its first
+backup completes, about 18 minutes after creation; demo 07's policy remediation
+needs 15–30 minutes). [demos/DEMO-SUMMARY.md](demos/DEMO-SUMMARY.md) is the
+one-page-per-demo version to keep open while you present.
 
 ### Prerequisites
 
@@ -172,12 +192,13 @@ from; demo 07's policy remediation needs 15–30 minutes).
 |---|---|---|
 | [Terraform](https://developer.hashicorp.com/terraform/install) | ≥ 1.6 | All demos |
 | [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) | ≥ 2.60 | All demos |
-| [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) | v4 | Demos 04 and 06 |
-| [go-sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/go-sqlcmd-utility) | any recent | Demo 06 only |
+| [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) | v4 | Demos 01 and 05 |
+| [go-sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/go-sqlcmd-utility) | any recent | Demo 01 only |
+| `jq` | any | Nicer output in a few demo commands |
 
-An Azure subscription you can create resource groups in. Demos 03–07 create role
+An Azure subscription you can create resource groups in. Demos 01 and 04–07 create role
 assignments scoped to resources they create, so those need `Owner` or
-`User Access Administrator`; demos 01 and 02 do not.
+`User Access Administrator`; demos 02 and 03 do not.
 
 ### Safety and cost
 
@@ -188,7 +209,7 @@ other people:
   management-group-level assignments, ever.
 - **Only one stack enforces anything by default**, and only inside its own resource
   group: demo 07's DeployIfNotExists policy adds a diagnostic setting to Key Vaults
-  in that resource group. Demo 01 assigns its initiative in `DoNotEnforce` mode with
+  in that resource group. Demo 02 assigns its initiative in `DoNotEnforce` mode with
   audit-only effects; Deny and Modify are separate opt-in switches.
 - **Every role assignment is on a resource or resource group the same stack
   created**, and disappears with `terraform destroy`.
@@ -214,6 +235,13 @@ Slide breaks are `###` headings and section breaks are `##` headings — hence
 `--slide-level=3`. Most markdown presentation tools will split it correctly given
 the same hint. Run pandoc from the repo root so the architecture slide finds
 `images/precon-architecture.png`.
+
+That gives you a plain, unstyled deck. The committed
+[azure-precon-slides.pptx](azure-precon-slides.pptx) started that way and was
+then designed by hand, so it doesn't regenerate: when you change `slides.md`,
+carry the change into the `.pptx` yourself. The same goes for the architecture
+diagram — re-export `images/precon-architecture.png` from the `.svg` and replace
+the picture on that slide.
 
 If you fork this for your own delivery, the parts most worth adapting are the
 `prefix` and `location` variables in each demo's `terraform.tfvars.example`, and
