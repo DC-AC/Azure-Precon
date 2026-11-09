@@ -115,11 +115,7 @@ variable "audit_effect" {
 }
 
 variable "tags" {
-  description = "Tags applied to the resource group and to the compliant sample resource."
+  description = "Extra tags for this stack, added to the standard set from modules/standard-tags."
   type        = map(string)
-  default = {
-    Environment = "Demo"
-    Workload    = "AzurePrecon"
-    Demo        = "02-policy-compliance"
-  }
+  default     = {}
 }

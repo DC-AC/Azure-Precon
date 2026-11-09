@@ -22,7 +22,7 @@ All commands run from the demo's `terraform/` folder, e.g.
 | When | What |
 |---|---|
 | **Day before** | **01** (restore needs a first backup, ~18 min after creation) · **03** with the VPN gateway (~32 min) · **01** and **05** code publish |
-| **T-60** | **02**, **04**, **06**, **07** — 1–5 min each; 07's policy then needs 15–30 min |
+| **T-60** | **02**, **04**, **06**, **07** — 2–9 min each (07 is slowest); 07's policy then needs 15–30 min |
 | **T-45** | **02**: trigger the compliance scan |
 | **T-30** | **01**: update `client_ip_address` to the venue IP · **07**: generate denied requests once |
 | **T-15** | Wake **01**'s database · run each demo's verification command |
@@ -83,7 +83,7 @@ blocked — before it blocks anything.
 **What's deployed:** an initiative (two custom audit policies plus the built-in
 *Allowed locations*, a Deny policy) assigned to the demo resource group in
 **DoNotEnforce** mode, and three storage accounts: `stgood` (compliant),
-`stbad` (no tag, public blob access), `stwrong` (wrong region).
+`stbad` (no `CostCenter` tag, public blob access), `stwrong` (wrong region).
 
 **Before you go on**
 - Applied at T-60, scan triggered at T-45:
@@ -226,7 +226,7 @@ variable, the connector uses a managed identity.
 identity pre-authorized to send to a storage queue.
 
 **Before you go on**
-- Applied at T-60 (~2 min); both curls below return 200 and 202
+- Applied at T-60 (~2½ min); both curls in step 2 return 200 and 202
 
 **Steps**
 1. **Trigger-driven** — Portal → Logic App → **Logic app designer**: the HTTP
@@ -238,10 +238,10 @@ identity pre-authorized to send to a storage queue.
 4. **The governance point** — `terraform apply -var 'approval_threshold=100' -auto-approve`,
    post the small order again → now **202**. The business rule is a diff.
 5. *(Optional)* **Managed identity on a connector** — designer → *Azure Queues* →
-   *Put a message on a queue* → authenticate with the managed identity.
-   ⚠️ The README's `az storage message peek` step currently fails: you have no
-   data role on that storage account (same gap fixed in demo 04). Show the message
-   in the portal's storage browser instead, or skip the peek.
+   *Put a message on a queue* → authenticate with the managed identity. Fire the
+   escalated order again, then show the message in the portal: storage account →
+   **Queues** → `escalations`. Don't peek from the CLI as yourself — only the
+   workflow has a queue role, so it's refused (control plane vs data plane).
 
 **Reset afterwards:** `terraform apply` (threshold back to 5000).
 
@@ -261,8 +261,10 @@ data role on; a metric alert and a log alert on 403s; an action group; a
 resource-group budget.
 
 **Before you go on**
-- `alert_email` and/or `alert_sms_number` set in `terraform.tfvars` — **currently blank**
-- Applied at T-60; denied requests generated once at T-30
+- `alert_email` and/or `alert_sms_number` set in `terraform.tfvars` — without
+  them the alerts fire but reach nobody. You'll get an *"added to an action group"*
+  message when routing works
+- Applied at T-60 (6–9 min); denied requests generated once at T-30
 - At T-15: `check_diagnostic_setting_command` shows `setByPolicy-LogAnalytics`;
   `query_command` returns rows
 

@@ -56,7 +56,7 @@ az login
 az account set --subscription "<your-subscription-id>"
 
 terraform init
-terraform apply          # ~3 minutes, most of it the deliberate 60s RBAC wait
+terraform apply          # ~5 minutes: the vault takes ~2½, then a deliberate 60 s RBAC wait
 ```
 
 Verify:
@@ -64,10 +64,11 @@ Verify:
 ```bash
 terraform output certificate_thumbprint
 eval "$(terraform output -raw list_versions_command)"     # expect exactly one version
+eval "$(terraform output -raw peek_events_command)"       # works once your queue role applies (1–2 min)
 ```
 
 **Requires:** `Owner` or `User Access Administrator` — Terraform grants itself
-Key Vault Administrator, and that is a role assignment.
+Key Vault Administrator and Storage Queue Data Reader, and those are role assignments.
 
 > **Write the starting thumbprint on the whiteboard.** The before/after comparison
 > in step 4 is the moment the demo lands, and squinting at a terminal scroll-back

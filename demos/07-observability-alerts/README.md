@@ -71,7 +71,7 @@ az login
 az account set --subscription "<your-subscription-id>"
 
 terraform init
-terraform apply            # ~3 minutes, including a deliberate 60 s RBAC wait
+terraform apply            # 6–9 minutes: vault, policy assignment and metric alert take ~2 min each, plus a 60 s RBAC wait
 
 terraform output alert_routing
 ```

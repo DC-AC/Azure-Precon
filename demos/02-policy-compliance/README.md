@@ -53,7 +53,7 @@ this demo — it's the version that teaches the safer habit.
 | **Initiative** grouping all three | "Group into initiatives for whole-estate guardrails" |
 | **Assignment** at RG scope, `enforce = false` | Scope for policy, in Azure's own report-only mode |
 | `stgood…` storage account | Compliant control case |
-| `stbad…` storage account | **Deliberately non-compliant** — no tag, public blob access allowed |
+| `stbad…` storage account | **Deliberately non-compliant** — every standard tag except `CostCenter`, and public blob access allowed |
 | `stwrong…` storage account, in `out_of_policy_location` | **Deliberately in the wrong region** — otherwise clean. The resource the Deny policy *would have refused to create* |
 
 **Opt-in only** (`enable_remediation = true`): a Modify policy, a system-assigned

@@ -45,12 +45,7 @@ variable "enable_queue_target" {
 }
 
 variable "tags" {
-  description = "Tags applied to every resource."
+  description = "Extra tags for this stack, added to the standard set from modules/standard-tags."
   type        = map(string)
-  default = {
-    Environment = "Demo"
-    Workload    = "AzurePrecon"
-    Demo        = "06-logic-app"
-    CostCenter  = "FIN-1042"
-  }
+  default     = {}
 }

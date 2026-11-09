@@ -78,10 +78,18 @@ locals {
   KQL
 }
 
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo       = "07-observability-alerts"
+  extra_tags = var.tags
+}
+
 resource "azurerm_resource_group" "this" {
   name     = "rg-demo07-monitor-${local.region_code}"
   location = var.location
-  tags     = var.tags
+  tags     = module.tags.tags
 }
 
 ###############################################################################
@@ -94,7 +102,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 # Saved queries, so nobody types KQL live. Workspace → Logs → Queries → "Precon".
@@ -199,8 +207,7 @@ resource "azurerm_key_vault" "this" {
   # Your laptop has to reach it to generate the denied requests.
   public_network_access_enabled = true
 
-  tags = var.tags
-
+  tags = module.tags.tags
   # Created after the assignment (and its rights) exist, so policy wires it up
   # at birth rather than waiting for a remediation task.
   depends_on = [time_sleep.policy_rbac_propagation]
@@ -241,8 +248,7 @@ resource "azurerm_monitor_action_group" "this" {
   name                = "ag-precon-${local.suffix}"
   resource_group_name = azurerm_resource_group.this.name
   short_name          = "precon"
-  tags                = var.tags
-
+  tags                = module.tags.tags
   dynamic "email_receiver" {
     for_each = var.alert_email != "" ? [var.alert_email] : []
     content {
@@ -276,8 +282,7 @@ resource "azurerm_monitor_metric_alert" "kv_forbidden" {
   frequency           = "PT1M"
   window_size         = "PT5M"
   auto_mitigate       = true
-  tags                = var.tags
-
+  tags                = module.tags.tags
   criteria {
     metric_namespace = "Microsoft.KeyVault/vaults"
     metric_name      = "ServiceApiResult"
@@ -346,7 +351,7 @@ resource "azurerm_monitor_scheduled_query_rules_alert_v2" "kv_forbidden_by_calle
     action_groups = [azurerm_monitor_action_group.this.id]
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 ###############################################################################

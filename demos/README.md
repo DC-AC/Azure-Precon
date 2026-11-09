@@ -4,8 +4,9 @@ Run-of-show scripts and Terraform for every **Demonstration** slide in
 [`../slides.md`](../slides.md).
 
 Each demo is a self-contained stack: its own Terraform state, its own resource
-group, its own teardown. Nothing here depends on anything else here, so you can
-deploy one, all seven, or whatever survives your timing.
+group, its own teardown. The stacks share one small module — the
+[tag standard](#conventions) — but no state, so you can deploy one, all seven,
+or whatever survives your timing.
 
 **Presenting?** [DEMO-SUMMARY.md](DEMO-SUMMARY.md) has every demo's point,
 pre-flight and steps on one page each.
@@ -66,14 +67,23 @@ anything extra:
 ```
 demos/
 ├── README.md                      ← you are here
+├── DEMO-SUMMARY.md                ← one page per demo, for while you present
 ├── scripts/
 │   ├── deploy-all.sh              ← deploy some or all stacks
 │   └── destroy-all.sh             ← tear them down (prompts for confirmation)
-├── 02-policy-compliance/
+├── modules/
+│   └── standard-tags/             ← the tag standard every stack calls
+├── 01-azure-sql-private/
 │   ├── README.md                  ← run-of-show script
+│   ├── sql/                       ← the one T-SQL grant, run live
+│   ├── src/                       ← Python functions using the SQL input binding
 │   └── terraform/
 │       ├── main.tf variables.tf outputs.tf versions.tf
-│       ├── terraform.tfvars.example
+│       ├── .terraform.lock.hcl    ← pinned provider versions
+│       └── terraform.tfvars.example
+├── 02-policy-compliance/
+│   ├── README.md
+│   └── terraform/
 │       └── policies/*.json        ← the custom policy definitions
 ├── 03-vnet-peering/
 ├── 04-keyvault-cert-rotation/
@@ -82,11 +92,6 @@ demos/
 │   ├── src/                       ← Python sample functions
 │   └── terraform/
 ├── 06-logic-app/
-├── 01-azure-sql-private/
-│   ├── README.md
-│   ├── sql/                       ← the one T-SQL grant, run live
-│   ├── src/                       ← Python functions using the SQL input binding
-│   └── terraform/
 └── 07-observability-alerts/
 ```
 
@@ -143,7 +148,7 @@ purpose, so the stack you rehearsed is the stack you present.
 | 01 — Azure SQL | **Owner** or `User Access Administrator` (four role assignments). You become the server's Entra admin |
 | 02 — Policy | `Resource Policy Contributor` + `Contributor` (defaults create no role assignment). **Owner**/UAA only if you opt into `enable_remediation` |
 | 03 — VNet Peering | `Contributor` |
-| 04 — Key Vault | **Owner** or `User Access Administrator` (Terraform grants itself Key Vault Administrator) |
+| 04 — Key Vault | **Owner** or `User Access Administrator` (Terraform grants itself Key Vault Administrator, and Storage Queue Data Reader on the events queue) |
 | 05 — Function App | **Owner** or `User Access Administrator` (four role assignments) |
 | 06 — Logic App | `Contributor`, or **Owner** if `enable_queue_target = true` |
 | 07 — Observability | **Owner**, or `User Access Administrator` + `Resource Policy Contributor` (policy assignment plus one role assignment for its identity) |
@@ -166,7 +171,7 @@ knowing before you point any of it at a subscription you share with other people
 | 01 — Azure SQL | Its own server, VNet and storage account | Role assignments are scoped to the storage account it created. The one database permission is granted in T-SQL, inside the demo database |
 | 02 — Policy | Its own resource group | **No.** Report-only: assignment is `DoNotEnforce`, effects are `Audit`, and no managed identity or role assignment is created. Deny and Modify are separate opt-ins |
 | 03 — VNet Peering | Its own VNets, NSGs and VMs | No. NSG rules apply only to the subnets this stack creates |
-| 04 — Key Vault | Its own vault | Role assignments are scoped to the vault it created — one for you, one for a demo identity |
+| 04 — Key Vault | Its own vault and events storage account | Role assignments are scoped to resources it created: on the vault, Key Vault Administrator for you and two read roles for a demo identity; on the events storage account, Storage Queue Data Reader for you |
 | 05 — Function App | Its own storage account | Role assignments are scoped to the storage account it created |
 | 06 — Logic App | Its own storage account | One role assignment, scoped to the storage account it created |
 | 07 — Observability | Key Vaults in its own resource group | **Yes, narrowly.** An enforced DeployIfNotExists assignment adds a diagnostic setting to Key Vaults *in its own resource group*. Its identity holds `Log Analytics Contributor` on that resource group only |
@@ -209,7 +214,7 @@ terraform init && terraform apply
 ```
 
 Demos 01 and 07 need values in `terraform.tfvars` before they're useful —
-`client_ip_address` for 06, `alert_email` and/or `alert_sms_number` for 07.
+`client_ip_address` for 01, `alert_email` and/or `alert_sms_number` for 07.
 `deploy-all.sh` will deploy them without, but the live beats won't land.
 
 ---
@@ -218,11 +223,11 @@ Demos 01 and 07 need values in `terraform.tfvars` before they're useful —
 
 | When | Do this | Why |
 |---|---|---|
-| **Day before** | Demo 03 with `deploy_vpn_gateway = true` | A VPN gateway takes 30–45 minutes |
+| **Day before** | Demo 03 with `deploy_vpn_gateway = true` | A VPN gateway takes 30–45 minutes (31 in testing) |
 | **Day before** | Demos 01 and 05 `terraform apply` + `func publish` | First publish does a remote build; it's slow and boring |
-| **Day before** | Demo 01 deployed and left overnight | Point-in-time restore needs history; a brand-new database has none |
+| **Day before** | Demo 01 deployed and left overnight | Point-in-time restore waits for the first backup (~18 minutes in testing), and an overnight database has real history to restore |
 | **Day before** | Rehearse each demo once, end to end — then reset demo 01 (see its README) | Every failure in the "if it breaks" tables is one somebody hit |
-| **T-60 min** | Demos 02, 04, 06, 07 `terraform apply` | All fast (1–3 min each); demo 07's remediation then needs 15–30 min |
+| **T-60 min** | Demos 02, 04, 06, 07 `terraform apply` | 2–9 min each in testing (07 is slowest); demo 07's remediation then needs 15–30 min |
 | **T-45 min** | `az policy state trigger-scan` for demo 02 | Compliance data takes minutes to appear, and the blade is empty without it |
 | **T-30 min** | Demo 01: update `client_ip_address` to the venue IP. Demo 07: generate denied requests once | Venue Wi-Fi isn't your rehearsal network; the workspace needs its first logs |
 | **T-15 min** | Run every verification command in the pre-flight sections; wake demo 01's database | Catch expired logins, quota errors and paused databases while you can still fix them |
@@ -239,13 +244,51 @@ unique (storage accounts, Key Vaults, SQL servers, function apps) also take
 `prefix` (default `azpre`) and a random 6-character suffix. One consequence: a
 given demo deploys once per subscription and region.
 
-**Tagging.** Every resource is tagged `Environment`, `Workload`, `Demo` and
-`CostCenter`. That's not decoration: demo 02's Modify policy inherits `CostCenter`
-from the resource group, and it's how you find leftovers in Cost Analysis:
+**Tagging.** Every taggable resource carries the same six tags. They're defined
+once, in [`modules/standard-tags`](modules/standard-tags/), and every stack calls
+that module — azurerm has no provider-level default tags, so a module is how you
+keep seven stacks saying the same thing. Each tag does one of the three jobs on
+the tagging slide:
+
+| Tag | Value | Job |
+|---|---|---|
+| `Workload` | `AzurePrecon` | **Cost** — every stack's spend under one name |
+| `CostCenter` | `FIN-1042` | **Cost** — who gets the chargeback. Demo 02's initiative audits for it |
+| `Environment` | `Demo` | **Automation** — what policies, budgets and cleanup jobs key off |
+| `Demo` | The folder name, e.g. `01-azure-sql-private` | **Automation** — which stack to change or `terraform destroy` |
+| `ManagedBy` | `Terraform` | **Automation** — change it in code, not in the portal |
+| `Owner` | `Platform Team` | **Ownership** — who to ask before deleting it. A team, not a person: people leave |
+
+Change a value in the module and every stack picks it up on its next
+`terraform apply` — in place, nothing is recreated. A stack can add its own tags
+through its `tags` variable, but it can't redefine one of the six; the module
+rejects that at plan time. The one deliberate gap is demo 02's `stbad…`, which
+carries everything except `CostCenter` because failing that audit is its job.
+
+Find everything the precon deployed, or anything that slipped through without an
+owner:
 
 ```bash
 az resource list --tag Workload=AzurePrecon -o table
+az resource list --query "[?starts_with(resourceGroup, 'rg-demo') && tags.Owner == null].{name:name, type:type, rg:resourceGroup}" -o table
 ```
+
+Not everything can carry the tags. Subnets, peerings, role assignments, policy
+assignments, diagnostic settings and storage queues aren't taggable resources.
+Log Analytics saved searches are, but changing their tags rebuilds them, so
+demo 07 leaves them alone. And Terraform can only tag what it manages. Anything
+Azure creates on your behalf is outside it, which is exactly why the second query
+above exists. In these stacks it finds:
+
+- the "Failure Anomalies" alert rule Application Insights adds in demos 01 and 05
+  — no tags at all
+- demo 01's private endpoint network interface — Azure copies the endpoint's
+  tags onto it once, at creation, and never again, so it lags behind any change
+- demo 01's `master` database — a system database, untagged
+
+At scale, the fix for these is policy, not Terraform: the built-in *Inherit a tag
+from the resource group if missing* (a Modify effect) — which is demo 02's opt-in
+remediation path.
 
 **No secrets in the repo.** `terraform.tfvars` is gitignored;
 `terraform.tfvars.example` is the committed template. Nothing in these stacks

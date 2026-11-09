@@ -71,11 +71,20 @@ locals {
   }
   region_code = lookup(local.region_codes, var.location, var.location)
 
-  rg_tags = merge(var.tags, { (var.required_tag_name) = var.required_tag_value })
+  rg_tags = merge(module.tags.tags, { (var.required_tag_name) = var.required_tag_value })
 
   # The identity and role assignment only exist when remediation is opted into
   # AND there is an assignment to attach them to.
   remediation_active = var.create_policy_assignment && var.enable_remediation
+}
+
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo        = "02-policy-compliance"
+  cost_center = var.required_tag_value
+  extra_tags  = var.tags
 }
 
 resource "azurerm_resource_group" "this" {
@@ -117,12 +126,14 @@ resource "azurerm_storage_account" "noncompliant" {
   # turn on both enable_remediation and enforce_policies.
   allow_nested_items_to_be_public = true
 
-  tags = var.tags
+  # Every standard tag except the one the initiative audits for.
+  tags = { for k, v in local.rg_tags : k => v if k != var.required_tag_name }
 
   lifecycle {
     # Relevant only in the opt-in remediation path, where policy adds the tag
-    # out of band. Harmless otherwise.
-    ignore_changes = [tags]
+    # out of band. ignore_changes can't take a variable, so this names the
+    # default required_tag_name — change both together.
+    ignore_changes = [tags["CostCenter"]]
   }
 }
 

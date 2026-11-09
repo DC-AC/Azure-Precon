@@ -49,10 +49,18 @@ locals {
   suffix = "${var.prefix}-${random_string.suffix.result}"
 }
 
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo       = "06-logic-app"
+  extra_tags = var.tags
+}
+
 resource "azurerm_resource_group" "this" {
   name     = "rg-demo06-logicapp-${local.region_code}"
   location = var.location
-  tags     = var.tags
+  tags     = module.tags.tags
 }
 
 ###############################################################################
@@ -63,8 +71,7 @@ resource "azurerm_logic_app_workflow" "orders" {
   name                = "logic-orders-${local.suffix}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
-
+  tags                = module.tags.tags
   # So connectors added later in the designer can authenticate as this workflow
   # rather than with a stored key.
   identity {
@@ -193,7 +200,7 @@ resource "azurerm_storage_account" "this" {
 
   allow_nested_items_to_be_public = false
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_storage_queue" "escalations" {

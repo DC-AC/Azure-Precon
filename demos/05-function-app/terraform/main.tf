@@ -48,10 +48,18 @@ locals {
   suffix = "${var.prefix}-${random_string.suffix.result}"
 }
 
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo       = "05-function-app"
+  extra_tags = var.tags
+}
+
 resource "azurerm_resource_group" "this" {
   name     = "rg-demo05-functions-${local.region_code}"
   location = var.location
-  tags     = var.tags
+  tags     = module.tags.tags
 }
 
 ###############################################################################
@@ -64,7 +72,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_application_insights" "this" {
@@ -73,7 +81,7 @@ resource "azurerm_application_insights" "this" {
   resource_group_name = azurerm_resource_group.this.name
   workspace_id        = azurerm_log_analytics_workspace.this.id
   application_type    = "web"
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 ###############################################################################
@@ -94,7 +102,7 @@ resource "azurerm_storage_account" "this" {
   # "Disable shared-key access where possible" — see the storage security slide.
   shared_access_key_enabled = !var.disable_storage_shared_key
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_storage_container" "deployments" {
@@ -120,7 +128,7 @@ resource "azurerm_user_assigned_identity" "deploy" {
   name                = "id-funcdeploy-${local.suffix}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_role_assignment" "deploy_blob_owner" {
@@ -139,7 +147,7 @@ resource "azurerm_service_plan" "this" {
   resource_group_name = azurerm_resource_group.this.name
   os_type             = "Linux"
   sku_name            = "FC1" # Flex Consumption
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_function_app_flex_consumption" "this" {
@@ -193,8 +201,7 @@ resource "azurerm_function_app_flex_consumption" "this" {
     }
   }
 
-  tags = var.tags
-
+  tags       = module.tags.tags
   depends_on = [azurerm_role_assignment.deploy_blob_owner]
 }
 

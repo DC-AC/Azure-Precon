@@ -67,10 +67,18 @@ locals {
   sql_connection_string = "Server=tcp:${azurerm_mssql_server.this.fully_qualified_domain_name},1433;Database=${azurerm_mssql_database.this.name};Authentication=Active Directory Managed Identity;Encrypt=True;"
 }
 
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo       = "01-azure-sql-private"
+  extra_tags = var.tags
+}
+
 resource "azurerm_resource_group" "this" {
   name     = "rg-demo01-sql-${local.region_code}"
   location = var.location
-  tags     = var.tags
+  tags     = module.tags.tags
 }
 
 ###############################################################################
@@ -82,7 +90,7 @@ resource "azurerm_virtual_network" "this" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.vnet_address_space]
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_subnet" "func" {
@@ -122,7 +130,7 @@ resource "azurerm_subnet" "private_endpoints" {
 resource "azurerm_private_dns_zone" "sql" {
   name                = "privatelink.database.windows.net"
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "sql" {
@@ -131,7 +139,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "sql" {
   private_dns_zone_name = azurerm_private_dns_zone.sql.name
   virtual_network_id    = azurerm_virtual_network.this.id
   registration_enabled  = false
-  tags                  = var.tags
+  tags                  = module.tags.tags
 }
 
 ###############################################################################
@@ -158,7 +166,7 @@ resource "azurerm_mssql_server" "this" {
     azuread_authentication_only = true
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_mssql_firewall_rule" "client" {
@@ -194,7 +202,7 @@ resource "azurerm_mssql_database" "this" {
     retention_days = 7
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_private_endpoint" "sql" {
@@ -202,8 +210,7 @@ resource "azurerm_private_endpoint" "sql" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   subnet_id           = azurerm_subnet.private_endpoints.id
-  tags                = var.tags
-
+  tags                = module.tags.tags
   private_service_connection {
     name                           = "psc-sql"
     private_connection_resource_id = azurerm_mssql_server.this.id
@@ -233,7 +240,7 @@ resource "azurerm_log_analytics_workspace" "this" {
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_application_insights" "this" {
@@ -242,7 +249,7 @@ resource "azurerm_application_insights" "this" {
   resource_group_name = azurerm_resource_group.this.name
   workspace_id        = azurerm_log_analytics_workspace.this.id
   application_type    = "web"
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_storage_account" "func" {
@@ -256,7 +263,7 @@ resource "azurerm_storage_account" "func" {
 
   allow_nested_items_to_be_public = false
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_storage_container" "deployments" {
@@ -269,7 +276,7 @@ resource "azurerm_user_assigned_identity" "deploy" {
   name                = "id-funcdeploy-${local.suffix}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_role_assignment" "deploy_blob_owner" {
@@ -284,7 +291,7 @@ resource "azurerm_service_plan" "this" {
   resource_group_name = azurerm_resource_group.this.name
   os_type             = "Linux"
   sku_name            = "FC1" # Flex Consumption
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_function_app_flex_consumption" "this" {
@@ -330,8 +337,7 @@ resource "azurerm_function_app_flex_consumption" "this" {
     "SqlConnectionString" = local.sql_connection_string
   }
 
-  tags = var.tags
-
+  tags       = module.tags.tags
   depends_on = [azurerm_role_assignment.deploy_blob_owner]
 }
 

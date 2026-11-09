@@ -68,10 +68,18 @@ locals {
   suffix = "${var.prefix}-${random_string.suffix.result}"
 }
 
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo       = "03-vnet-peering"
+  extra_tags = var.tags
+}
+
 resource "azurerm_resource_group" "this" {
   name     = "rg-demo03-network-${local.region_code}"
   location = var.location
-  tags     = var.tags
+  tags     = module.tags.tags
 }
 
 ###############################################################################
@@ -83,7 +91,7 @@ resource "azurerm_virtual_network" "hub" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.hub_address_space]
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_subnet" "hub_workload" {
@@ -118,7 +126,7 @@ resource "azurerm_virtual_network" "spoke1" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.spoke1_address_space]
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_subnet" "spoke1_workload" {
@@ -133,7 +141,7 @@ resource "azurerm_virtual_network" "spoke2" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
   address_space       = [var.spoke2_address_space]
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_subnet" "spoke2_workload" {
@@ -151,8 +159,7 @@ resource "azurerm_network_security_group" "workload" {
   name                = "nsg-workload-${local.suffix}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
-
+  tags                = module.tags.tags
   # Service tags instead of hand-maintained CIDR lists — the ASG/service-tag
   # slide, made concrete.
   security_rule {
@@ -220,7 +227,7 @@ resource "azurerm_public_ip" "vpn" {
   allocation_method   = "Static"
   sku                 = "Standard"
   zones               = ["1", "2", "3"]
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_virtual_network_gateway" "vpn" {
@@ -247,7 +254,7 @@ resource "azurerm_virtual_network_gateway" "vpn" {
     subnet_id                     = azurerm_subnet.gateway.id
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 ###############################################################################
@@ -360,7 +367,7 @@ resource "azurerm_public_ip" "bastion" {
   resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_bastion_host" "this" {
@@ -377,7 +384,7 @@ resource "azurerm_bastion_host" "this" {
     public_ip_address_id = azurerm_public_ip.bastion[0].id
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 ###############################################################################
@@ -398,8 +405,7 @@ resource "azurerm_network_interface" "test" {
   name                = "nic-${each.key}-${local.suffix}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
-
+  tags                = module.tags.tags
   ip_configuration {
     name                          = "internal"
     subnet_id                     = each.value
@@ -412,13 +418,12 @@ resource "azurerm_network_interface" "test" {
 resource "azurerm_linux_virtual_machine" "test" {
   for_each = local.test_vms
 
-  name                = "vm-${each.key}-${var.prefix}"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
-  size                = var.vm_size
-  admin_username      = var.admin_username
-  tags                = var.tags
-
+  name                  = "vm-${each.key}-${var.prefix}"
+  location              = azurerm_resource_group.this.location
+  resource_group_name   = azurerm_resource_group.this.name
+  size                  = var.vm_size
+  admin_username        = var.admin_username
+  tags                  = module.tags.tags
   network_interface_ids = [azurerm_network_interface.test[each.key].id]
 
   # Password auth so Bastion login works live without key distribution.

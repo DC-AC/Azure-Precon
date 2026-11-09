@@ -52,10 +52,18 @@ locals {
   suffix = "${var.prefix}-${random_string.suffix.result}"
 }
 
+# The precon-wide tag standard. See ../../modules/standard-tags.
+module "tags" {
+  source = "../../modules/standard-tags"
+
+  demo       = "04-keyvault-cert-rotation"
+  extra_tags = var.tags
+}
+
 resource "azurerm_resource_group" "this" {
   name     = "rg-demo04-keyvault-${local.region_code}"
   location = var.location
-  tags     = var.tags
+  tags     = module.tags.tags
 }
 
 ###############################################################################
@@ -85,7 +93,7 @@ resource "azurerm_key_vault" "this" {
     default_action = "Allow"
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 ###############################################################################
@@ -112,7 +120,7 @@ resource "azurerm_user_assigned_identity" "app" {
   name                = "id-app-${local.suffix}"
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
-  tags                = var.tags
+  tags                = module.tags.tags
 }
 
 resource "azurerm_role_assignment" "app_certificate_user" {
@@ -136,8 +144,7 @@ resource "azurerm_role_assignment" "app_secret_user" {
 resource "azurerm_key_vault_certificate" "app" {
   name         = var.certificate_name
   key_vault_id = azurerm_key_vault.this.id
-  tags         = var.tags
-
+  tags         = module.tags.tags
   certificate_policy {
     # "Self" = self-signed, issued by Key Vault itself. For a public cert you
     # swap this for an integrated CA (DigiCert / GlobalSign) — see the
@@ -230,7 +237,7 @@ resource "azurerm_storage_account" "events" {
 
   allow_nested_items_to_be_public = false
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_storage_queue" "cert_events" {
@@ -263,7 +270,7 @@ resource "azurerm_eventgrid_system_topic" "kv" {
     type = "SystemAssigned"
   }
 
-  tags = var.tags
+  tags = module.tags.tags
 }
 
 resource "azurerm_eventgrid_system_topic_event_subscription" "cert_events" {

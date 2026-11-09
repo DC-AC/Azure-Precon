@@ -65,7 +65,7 @@ az login
 az account set --subscription "<your-subscription-id>"
 
 terraform init
-terraform apply          # ~1 minute
+terraform apply          # ~2½ minutes, most of it the storage account
 ```
 
 Verify both branches fire:
@@ -191,13 +191,15 @@ terraform output queue_storage_account   # holds Storage Queue Data Message Send
 ```
 
 Point the action at the `escalations` queue with `@{outputs('Build_order_record')}`
-as the message, save, then fire the escalated payload again and peek the queue:
+as the message, save, then fire the escalated payload again and show the message
+landed: storage account → **Queues** → `escalations`.
 
-```bash
-az storage message peek --queue-name escalations \
-  --account-name "$(terraform output -raw queue_storage_account)" \
-  --auth-mode login --num-messages 5 -o json
-```
+> **Use the portal here, not `az storage message peek --auth-mode login`.** This
+> stack gives a queue role only to the *workflow's* identity, not to you, so a
+> CLI peek as yourself is refused — even as subscription Owner. The portal reads
+> the queue with the account key, which your Owner role can list. If you want the
+> CLI version, give yourself `Storage Queue Data Reader` on the account the way
+> demo 04 does. Either way, it's a live example of control plane vs data plane.
 
 > "Notice what the connection dialog did *not* ask me for. No account key, no
 > connection string, no SAS token. The workflow has an identity and the identity
@@ -240,6 +242,7 @@ az eventgrid event-subscription create \
 | Actions vanish after `terraform apply` | Parallel writes to the same workflow | The `depends_on` chain prevents this; if you add an action, chain it too |
 | Designer changes lost on next apply | Terraform owns the definition | Expected. Port designer edits back into `main.tf` — that's the governance point, not a bug |
 | Connector shows no managed-identity option | Role assignment not propagated | Wait 2–3 min, or check `enable_queue_target = true` |
+| `az storage message peek --auth-mode login` → "required permissions" | Only the workflow identity has a queue role; you don't | Show the queue in the portal instead (step 5) |
 
 ---
 

@@ -20,7 +20,8 @@ architecture or platform roles.
 
 | Path | What it is |
 |---|---|
-| [slides.md](slides.md) | The deck — every slide, in delivery order, as speaker-ready bullets |
+| [slides.md](slides.md) | The deck — every slide, in delivery order, as speaker-ready bullets. The source of truth for content |
+| [azure-precon-slides.pptx](azure-precon-slides.pptx) | The designed deck you present from: generated from `slides.md`, then styled by hand |
 | [demos/](demos/) | Terraform + run-of-show scripts for the seven **Demonstration** slides |
 | [demos/README.md](demos/README.md) | Demo index: slide map, prerequisites, blast radius, precon-day schedule, cost |
 | [demos/DEMO-SUMMARY.md](demos/DEMO-SUMMARY.md) | One page per demo — the point, pre-flight, and the steps in order |
@@ -126,7 +127,10 @@ The demos were then deployed and run end to end against a live subscription. Tha
 shook out a handful of real bugs (all fixed — see each demo's *If it breaks*
 table), and two conventions changed: **demos are now numbered in delivery order**
 (the Azure SQL demo is 01), and **resource groups are named
-`rg-demoNN-<core tech>-<region>`** instead of carrying a random suffix.
+`rg-demoNN-<core tech>-<region>`** instead of carrying a random suffix. Every
+resource now carries the same six tags — `Workload`, `CostCenter`, `Environment`,
+`Demo`, `ManagedBy`, `Owner` — from one shared module, applied in place to the
+running demos. See [Conventions](demos/README.md#conventions).
 
 ---
 
@@ -159,7 +163,7 @@ portal blade.
 ### Quick start
 
 ```bash
-az login
+az login                             # must be MFA-backed — see the note below
 az account set --subscription "<your-subscription-id>"
 
 cd demos
@@ -167,11 +171,20 @@ cd demos
 ./scripts/deploy-all.sh 01 05        # or just the ones you need
 ```
 
+> **Mandatory MFA.** Azure refuses create, update and delete calls from tokens
+> without an MFA claim. If `terraform apply` fails with `RequestDisallowedByAzure`
+> while plain `az` commands work, Terraform is still getting a cached non-MFA
+> token. The fix is `az logout`, then sign in again with the claims challenge —
+> the exact commands are in the
+> [Mandatory MFA note](demos/README.md#prerequisites).
+
 Read [demos/README.md](demos/README.md) before a live session — it has the
 day-before / T-60 / T-15 schedule, and the demos that need advance notice (a VPN
-gateway takes 30–45 minutes to provision; the function apps' first code publish
-does a slow remote build; demo 01's database needs a day of history to restore
-from; demo 07's policy remediation needs 15–30 minutes).
+gateway took 31 minutes to provision in testing; the function apps' first code
+publish does a remote build; demo 01's database can't be restored until its first
+backup completes, about 18 minutes after creation; demo 07's policy remediation
+needs 15–30 minutes). [demos/DEMO-SUMMARY.md](demos/DEMO-SUMMARY.md) is the
+one-page-per-demo version to keep open while you present.
 
 ### Prerequisites
 
@@ -181,6 +194,7 @@ from; demo 07's policy remediation needs 15–30 minutes).
 | [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) | ≥ 2.60 | All demos |
 | [Azure Functions Core Tools](https://learn.microsoft.com/azure/azure-functions/functions-run-local) | v4 | Demos 01 and 05 |
 | [go-sqlcmd](https://learn.microsoft.com/sql/tools/sqlcmd/go-sqlcmd-utility) | any recent | Demo 01 only |
+| `jq` | any | Nicer output in a few demo commands |
 
 An Azure subscription you can create resource groups in. Demos 01 and 04–07 create role
 assignments scoped to resources they create, so those need `Owner` or
@@ -221,6 +235,13 @@ Slide breaks are `###` headings and section breaks are `##` headings — hence
 `--slide-level=3`. Most markdown presentation tools will split it correctly given
 the same hint. Run pandoc from the repo root so the architecture slide finds
 `images/precon-architecture.png`.
+
+That gives you a plain, unstyled deck. The committed
+[azure-precon-slides.pptx](azure-precon-slides.pptx) started that way and was
+then designed by hand, so it doesn't regenerate: when you change `slides.md`,
+carry the change into the `.pptx` yourself. The same goes for the architecture
+diagram — re-export `images/precon-architecture.png` from the `.svg` and replace
+the picture on that slide.
 
 If you fork this for your own delivery, the parts most worth adapting are the
 `prefix` and `location` variables in each demo's `terraform.tfvars.example`, and
